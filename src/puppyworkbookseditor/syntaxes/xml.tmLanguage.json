@@ -1,18 +1,25 @@
 {
-	"information_for_contributors": [
-		"This file has been converted from https://github.com/atom/language-xml/blob/master/grammars/xml.cson",
-		"If you want to provide a fix or improvement, please create a pull request against the original repository.",
-		"Once accepted there, we are happy to receive an update request."
-	],
-	"version": "https://github.com/atom/language-xml/commit/7bc75dfe779ad5b35d9bf4013d9181864358cb49",
-	"name": "XML",
-	"scopeName": "text.xml",
-	"patterns": [{
-        "begin": "(<Formula>)",
-        "end": "(</Formula>)",
-        "patterns": [
-            { "include": "source.powerfx" }
-        ]
-        }
-    ]
+  "name": "Power Fx in XML Formula elements",
+  "scopeName": "text.xml.powerfx.injection",
+  "injectionSelector": "L:text.xml",
+  "patterns": [
+    {
+      "begin": "(<)(Formula)(>)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.xml" },
+        "2": { "name": "entity.name.tag.localname.xml" },
+        "3": { "name": "punctuation.definition.tag.end.xml" }
+      },
+      "end": "(</)(Formula)(>)",
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.xml" },
+        "2": { "name": "entity.name.tag.localname.xml" },
+        "3": { "name": "punctuation.definition.tag.end.xml" }
+      },
+      "contentName": "source.powerfx",
+      "patterns": [
+        { "include": "source.powerfx" }
+      ]
+    }
+  ]
 }

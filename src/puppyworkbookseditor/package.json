@@ -16,8 +16,7 @@
     "languages": [
       {
         "id": "powerfx",
-        "aliases": ["PowerFx"],
-        "extensions": [".fx.xml"]
+        "aliases": ["PowerFx"]
       }
     ],
     "grammars": [
@@ -27,9 +26,11 @@
         "path": "./syntaxes/powerfx.tmLanguage.json"
       },
       {
-        "language": "xml",
-        "scopeName": "source.xml",
-        "path": "./syntaxes/xml.tmLanguage.json"
+        "scopeName": "text.xml.powerfx.injection",
+        "path": "./syntaxes/xml.tmLanguage.json",
+        "injectTo": [
+          "text.xml"
+        ]
       }
     ]
   },
