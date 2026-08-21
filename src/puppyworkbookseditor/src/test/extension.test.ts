@@ -3,7 +3,7 @@ import * as assert from 'assert';
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
 import * as vscode from 'vscode';
-import { getAllowedChildren, isInsideFormula, validateXmlNodes } from '../extension';
+import { formatCliJson, getAllowedChildren, isInsideFormula, validateXmlNodes } from '../extension';
 
 suite('Extension Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');
@@ -29,5 +29,10 @@ suite('Extension Test Suite', () => {
 		assert.strictEqual(issues.length, 2);
 		assert.match(issues[0].message, /not allowed/);
 		assert.match(issues[1].message, /Unknown/);
+	});
+
+	test('formats JSON emitted by the worksheet CLI', () => {
+		assert.strictEqual(formatCliJson('{"total":3,"names":["Ada"]}'), '{\n  "total": 3,\n  "names": [\n    "Ada"\n  ]\n}');
+		assert.strictEqual(formatCliJson('not json'), undefined);
 	});
 });

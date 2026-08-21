@@ -32,7 +32,33 @@
           "text.xml"
         ]
       }
-    ]
+    ],
+    "commands": [
+      {
+        "command": "puppyworkbookseditor.openWorksheetPreview",
+        "title": "Puppy Workbooks: Open Worksheet Preview",
+        "icon": "$(preview)"
+      },
+      {
+        "command": "puppyworkbookseditor.runWorksheet",
+        "title": "Puppy Workbooks: Run Worksheet",
+        "icon": "$(run)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "puppyworkbookseditor.runWorksheet",
+          "when": "editorLangId == xml",
+          "group": "navigation@1"
+        },
+        {
+          "command": "puppyworkbookseditor.openWorksheetPreview",
+          "when": "editorLangId == xml",
+          "group": "navigation@2"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
