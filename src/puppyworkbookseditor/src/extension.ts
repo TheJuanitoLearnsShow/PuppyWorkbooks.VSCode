@@ -158,7 +158,8 @@ function getTextBetweenFirstAndLastBrace(str: string): string {
 	}
 
 	// Extract substring from first `{` to last `}`
-	return str.substring(firstIndex + 1, lastIndex);
+	const substring = str.substring(firstIndex, lastIndex + 1);
+	return substring;
 }
 
 export function formatCliJson(stdout: string): string | undefined {

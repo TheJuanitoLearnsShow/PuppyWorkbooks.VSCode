@@ -3,7 +3,7 @@
  xsi:noNamespaceSchemaLocation="Map.xsd">
     <Name>Map</Name>
     <Variables>
-        <Variable><Key>InputRecord</Key><Value>{Name:"Sample",Amount:1,Active:"true"}</Value></Variable>
+        <Variable><Key>InputRecord</Key><Value>{Name:"Sample",Amount:5,Active:"true"}</Value></Variable>
     </Variables>
     <Cells>
         <WorkCell>
