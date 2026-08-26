@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<WorkSheet>
+<WorkSheet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="Map.xsd">
     <Name>Map</Name>
     <Variables>
         <Variable><Key>InputRecord</Key><Value>{Name:"Sample",Amount:1,Active:"true"}</Value></Variable>
     </Variables>
     <Cells>
+        <WorkCell>
+            <Id>0</Id>
+            <Name>AgeMultier</Name>
+            <Formula>3</Formula>
+            <Comments/>
+        </WorkCell>
         <WorkCell>
             <Id>1</Id>
             <Name>Name</Name>
@@ -14,13 +21,15 @@
         <WorkCell>
             <Id>2</Id>
             <Name>Amount</Name>
-            <Formula>Value(InputRecord.Amount)</Formula>
+            <Formula>InputRecord.Amount * AgeMultier</Formula>
             <Comments/>
         </WorkCell>
         <WorkCell>
             <Id>3</Id>
             <Name>IsActive</Name>
-            <Formula>InputRecord.Active = &quot;true&quot;</Formula>
+            <Formula><![CDATA[ 
+                InputRecord.Active = "true"
+                ]]></Formula>
             <Comments/>
         </WorkCell>
     </Cells>

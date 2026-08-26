@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import { execFile } from 'child_process';
 import * as path from 'path';
+import { registerWorksheetPreviewCommand } from './worksheetPreview';
+import { registerRunWorksheetCommand } from './worksheetRunner';
 
 type ElementName = keyof typeof CHILDREN_BY_PARENT;
 
@@ -146,9 +148,23 @@ export function validateXmlNodes(xml: string): XmlValidationIssue[] {
 	return issues;
 }
 
+function getTextBetweenFirstAndLastBrace(str: string): string {
+	const firstIndex = str.indexOf('{');
+	const lastIndex = str.lastIndexOf('}'); // Note: you want the last `}`
+
+	// If either is not found, return empty string
+	if (firstIndex === -1 || lastIndex === -1) {
+		return '';
+	}
+
+	// Extract substring from first `{` to last `}`
+	return str.substring(firstIndex + 1, lastIndex);
+}
+
 export function formatCliJson(stdout: string): string | undefined {
 	try {
-		return JSON.stringify(JSON.parse(stdout), undefined, 2);
+		const jsonContent = getTextBetweenFirstAndLastBrace(stdout);
+		return JSON.stringify(JSON.parse(jsonContent), undefined, 2);
 	} catch {
 		return undefined;
 	}
@@ -181,39 +197,6 @@ function isWorksheetDocument(document: vscode.TextDocument): boolean {
 function getDiagnosticRange(document: vscode.TextDocument): vscode.Range {
 	const firstLine = document.lineAt(0);
 	return new vscode.Range(firstLine.range.start, firstLine.range.start.translate(0, Math.max(firstLine.text.length, 1)));
-}
-
-function createPreviewHtml(): string {
-	return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-body { color: var(--vscode-editor-foreground); font-family: var(--vscode-font-family); padding: 1rem; }
-button { margin-bottom: 1rem; }
-pre { background: var(--vscode-textCodeBlock-background); border-radius: 4px; padding: 1rem; white-space: pre-wrap; }
-.error { color: var(--vscode-errorForeground); }
-</style>
-</head>
-<body>
-<button id="refresh">Refresh</button>
-<div id="status">Run the worksheet to view its JSON output.</div>
-<pre id="output"></pre>
-<script>
-const vscode = acquireVsCodeApi();
-document.getElementById('refresh').addEventListener('click', () => vscode.postMessage({ type: 'refresh' }));
-window.addEventListener('message', event => {
-	const message = event.data;
-	const status = document.getElementById('status');
-	const output = document.getElementById('output');
-	status.textContent = message.status;
-	status.className = message.isError ? 'error' : '';
-	output.textContent = message.output || '';
-});
-</script>
-</body>
-</html>`;
 }
 
 function createElementCompletion(name: string): vscode.CompletionItem {
@@ -273,70 +256,22 @@ export function activate(context: vscode.ExtensionContext): void {
 			},
 			'<', '.', '('
 		),
-		vscode.commands.registerCommand('puppyworkbookseditor.runWorksheet', async () => {
-			const document = vscode.window.activeTextEditor?.document;
-			if (document === undefined || !isWorksheetDocument(document)) {
-				void vscode.window.showErrorMessage('Open a saved Worksheet or WorkSheet XML file before running it.');
-				return;
-			}
-			if (document.isDirty && !await document.save()) {
-				return;
-			}
-			try {
-				const result = await executeWorksheet(document.uri.fsPath);
-				const formattedJson = formatCliJson(result.stdout);
-				if (formattedJson === undefined) {
-					cliDiagnostics.set(document.uri, [new vscode.Diagnostic(getDiagnosticRange(document), 'PuppyWorkbooks.CLI.exe returned output that is not valid JSON.', vscode.DiagnosticSeverity.Warning)]);
-				} else {
-					cliDiagnostics.delete(document.uri);
-				}
-				outputChannel.clear();
-				outputChannel.appendLine(formattedJson ?? result.stdout);
-				if (result.stderr) {
-					outputChannel.appendLine(result.stderr);
-				}
-				outputChannel.show(true);
-			} catch (error) {
-				const message = error instanceof CliExecutionError ? error.stderr || error.message : String(error);
-				cliDiagnostics.set(document.uri, [new vscode.Diagnostic(getDiagnosticRange(document), `PuppyWorkbooks.CLI.exe failed: ${message}`, vscode.DiagnosticSeverity.Error)]);
-				void vscode.window.showErrorMessage('Puppy Workbooks CLI failed. See Problems for details.');
-			}
+		registerRunWorksheetCommand({
+			cliDiagnostics,
+			executeWorksheet,
+			formatCliJson,
+			getDiagnosticRange,
+			isWorksheetDocument,
+			outputChannel,
+			toCliErrorMessage: error => error instanceof CliExecutionError ? error.stderr || error.message : String(error)
 		}),
-		vscode.commands.registerCommand('puppyworkbookseditor.openWorksheetPreview', async () => {
-			const document = vscode.window.activeTextEditor?.document;
-			if (document === undefined || !isWorksheetDocument(document)) {
-				void vscode.window.showErrorMessage('Open a saved Worksheet or WorkSheet XML file to preview it.');
-				return;
-			}
-			const panel = vscode.window.createWebviewPanel('puppyWorkbookPreview', 'Puppy Workbook Preview', vscode.ViewColumn.Beside, { enableScripts: true });
-			panel.webview.html = createPreviewHtml();
-			const refresh = async (): Promise<void> => {
-				if (document.isDirty && !await document.save()) {
-					return;
-				}
-				void panel.webview.postMessage({ status: 'Running PuppyWorkbooks.CLI.exe…', output: '', isError: false });
-				try {
-					const result = await executeWorksheet(document.uri.fsPath);
-					const formattedJson = formatCliJson(result.stdout);
-					if (formattedJson === undefined) {
-						cliDiagnostics.set(document.uri, [new vscode.Diagnostic(getDiagnosticRange(document), 'PuppyWorkbooks.CLI.exe returned output that is not valid JSON.', vscode.DiagnosticSeverity.Warning)]);
-						void panel.webview.postMessage({ status: 'CLI output was not valid JSON.', output: result.stdout, isError: true });
-						return;
-					}
-					cliDiagnostics.delete(document.uri);
-					void panel.webview.postMessage({ status: result.stderr || 'Completed successfully.', output: formattedJson, isError: false });
-				} catch (error) {
-					const message = error instanceof CliExecutionError ? error.stderr || error.message : String(error);
-					cliDiagnostics.set(document.uri, [new vscode.Diagnostic(getDiagnosticRange(document), `PuppyWorkbooks.CLI.exe failed: ${message}`, vscode.DiagnosticSeverity.Error)]);
-					void panel.webview.postMessage({ status: `CLI failed: ${message}`, output: '', isError: true });
-				}
-			};
-			context.subscriptions.push(panel.webview.onDidReceiveMessage(message => {
-				if (message.type === 'refresh') {
-					void refresh();
-				}
-			}));
-			await refresh();
+		registerWorksheetPreviewCommand(context, {
+			cliDiagnostics,
+			executeWorksheet,
+			formatCliJson,
+			getDiagnosticRange,
+			isWorksheetDocument,
+			toCliErrorMessage: error => error instanceof CliExecutionError ? error.stderr || error.message : String(error)
 		})
 	);
 
