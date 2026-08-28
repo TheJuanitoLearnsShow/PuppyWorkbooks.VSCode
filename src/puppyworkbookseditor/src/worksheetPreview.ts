@@ -23,24 +23,109 @@ function createPreviewHtml(): string {
 <style>
 body { color: var(--vscode-editor-foreground); font-family: var(--vscode-font-family); padding: 1rem; }
 button { margin-bottom: 1rem; }
-pre { background: var(--vscode-textCodeBlock-background); border-radius: 4px; padding: 1rem; white-space: pre-wrap; }
+.json-table { border-collapse: collapse; margin-top: 1rem; width: 100%; }
+.json-table th, .json-table td { border: 1px solid var(--vscode-panel-border, var(--vscode-editorWidget-border)); padding: 0.5rem 0.75rem; text-align: left; vertical-align: top; }
+.json-table th { background: var(--vscode-list-hoverBackground); font-weight: 600; }
+.json-table tr:nth-child(even) { background: var(--vscode-list-inactiveSelectionBackground); }
+.json-table .json-table { margin: 0; width: auto; min-width: 100%; }
+.json-key, .json-index { color: var(--vscode-symbolIcon-keywordForeground); font-weight: 600; white-space: nowrap; }
+.json-null { color: var(--vscode-descriptionForeground); font-style: italic; }
+.json-boolean { color: var(--vscode-debugTokenExpression-boolean); }
+.json-number { color: var(--vscode-debugTokenExpression-number); }
+.json-string { color: var(--vscode-debugTokenExpression-string); white-space: pre-wrap; }
+.json-empty { color: var(--vscode-descriptionForeground); font-style: italic; }
 .error { color: var(--vscode-errorForeground); }
 </style>
 </head>
 <body>
 <button id="refresh">Refresh</button>
 <div id="status">Run the worksheet to view its JSON output.</div>
-<pre id="output"></pre>
+<div id="output"></div>
 <script>
 const vscode = acquireVsCodeApi();
 document.getElementById('refresh').addEventListener('click', () => vscode.postMessage({ type: 'refresh' }));
+
+function createTable(headers) {
+	const table = document.createElement('table');
+	table.className = 'json-table';
+	const headerRow = table.createTHead().insertRow();
+	for (const header of headers) {
+		const cell = document.createElement('th');
+		cell.textContent = header;
+		headerRow.appendChild(cell);
+	}
+	return table;
+}
+
+function renderValue(value) {
+	if (Array.isArray(value)) {
+		const table = createTable(['Index', 'Value']);
+		const body = table.createTBody();
+		if (value.length === 0) {
+			const row = body.insertRow();
+			const cell = row.insertCell();
+			cell.colSpan = 2;
+			cell.className = 'json-empty';
+			cell.textContent = 'Empty array';
+		} else {
+			value.forEach((item, index) => {
+				const row = body.insertRow();
+				const indexCell = row.insertCell();
+				indexCell.className = 'json-index';
+				indexCell.textContent = index;
+				row.insertCell().appendChild(renderValue(item));
+			});
+		}
+		return table;
+	}
+
+	if (value !== null && typeof value === 'object') {
+		const table = createTable(['Property', 'Value']);
+		const body = table.createTBody();
+		const entries = Object.entries(value);
+		if (entries.length === 0) {
+			const row = body.insertRow();
+			const cell = row.insertCell();
+			cell.colSpan = 2;
+			cell.className = 'json-empty';
+			cell.textContent = 'Empty record';
+		} else {
+			for (const [key, item] of entries) {
+				const row = body.insertRow();
+				const keyCell = row.insertCell();
+				keyCell.className = 'json-key';
+				keyCell.textContent = key;
+				row.insertCell().appendChild(renderValue(item));
+			}
+		}
+		return table;
+	}
+
+	const valueElement = document.createElement('span');
+	if (value === null) {
+		valueElement.className = 'json-null';
+		valueElement.textContent = 'null';
+	} else {
+		valueElement.className = 'json-' + typeof value;
+		valueElement.textContent = String(value);
+	}
+	return valueElement;
+}
+
 window.addEventListener('message', event => {
 	const message = event.data;
 	const status = document.getElementById('status');
 	const output = document.getElementById('output');
 	status.textContent = message.status;
 	status.className = message.isError ? 'error' : '';
-	output.textContent = message.output || '';
+	output.replaceChildren();
+	if (message.output) {
+		if (message.isError) {
+			output.textContent = message.output;
+		} else {
+			output.appendChild(renderValue(JSON.parse(message.output)));
+		}
+	}
 });
 </script>
 </body>
