@@ -1,0 +1,48 @@
+name: Package VS Code extension
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: Build VSIX installer
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/puppyworkbookseditor
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: src/puppyworkbookseditor/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Package extension
+        run: npx --yes @vscode/vsce package --out puppyworkbookseditor.vsix
+
+      - name: Upload VSIX workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: puppyworkbookseditor-vsix
+          path: src/puppyworkbookseditor/puppyworkbookseditor.vsix
+          if-no-files-found: error
+
+      - name: Attach VSIX to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" puppyworkbookseditor.vsix --clobber
