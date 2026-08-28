@@ -18,7 +18,8 @@ interface WorksheetRunnerDependencies {
 export function registerRunWorksheetCommand(dependencies: WorksheetRunnerDependencies): vscode.Disposable {
 	return vscode.commands.registerCommand('puppyworkbookseditor.runWorksheet', async () => {
 		const document = vscode.window.activeTextEditor?.document;
-		if (document === undefined || !dependencies.isWorksheetDocument(document)) {
+		const isWorksheet = document !== undefined && dependencies.isWorksheetDocument(document);
+		if (!isWorksheet) {
 			void vscode.window.showErrorMessage('Open a saved Worksheet or WorkSheet XML file before running it.');
 			return;
 		}

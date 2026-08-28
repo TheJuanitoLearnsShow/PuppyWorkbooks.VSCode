@@ -191,8 +191,10 @@ function isWorksheetDocument(document: vscode.TextDocument): boolean {
 	if (document.languageId !== 'xml' || document.uri.scheme !== 'file') {
 		return false;
 	}
-	return getXmlTags(document.getText()).find(tag => !tag.isClosing)?.name === 'Worksheet'
-		|| getXmlTags(document.getText()).find(tag => !tag.isClosing)?.name === 'WorkSheet';
+	const firstTag = getXmlTags(document.getText()).find(tag => !tag.isClosing);
+	return firstTag?.name === 'Worksheet' 
+		|| firstTag?.name === 'WorkSheet'
+		|| firstTag?.name === 'Integration';
 }
 
 function getDiagnosticRange(document: vscode.TextDocument): vscode.Range {
