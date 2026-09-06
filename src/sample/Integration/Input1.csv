@@ -1,3 +1,4 @@
-1
-2
-3
+Name,Amount,Active
+Alice,10,true
+Bob,100,false
+Tres,23,false

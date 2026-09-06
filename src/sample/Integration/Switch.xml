@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Integration Name="Switch branches">
     <Steps>
-        <IOInput Id="input" Kind="CSVReader" FilePath="__INPUT_PATH__" />
+        <IOInput Id="input" Kind="CSVReader" FilePath="Input1.csv" />
         <Switch Id="choose">
             <Worksheet>
                 <Cells>
