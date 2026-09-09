@@ -1,0 +1,121 @@
+[
+  {
+    "InputRow": {
+      "Name": "Alice",
+      "Amount": "10",
+      "Active": "true"
+    },
+    "Steps": [
+      {
+        "Id": "input",
+        "StepType": "IOInput",
+        "Cells": {
+          "Name": "Alice",
+          "Amount": "10",
+          "Active": "true"
+        }
+      },
+      {
+        "Id": "map",
+        "StepType": "Map",
+        "Cells": {
+          "AgeMultier": 3,
+          "Name": "Alice",
+          "Amount": "10",
+          "IsActive": true
+        }
+      },
+      {
+        "Id": "filter",
+        "StepType": "Filter",
+        "Cells": {
+          "Keep": true
+        }
+      },
+      {
+        "Id": "reduce",
+        "StepType": "Reduce",
+        "Cells": {
+          "Total": 10
+        }
+      },
+      {
+        "Id": "output",
+        "StepType": "IOOutput",
+        "Cells": {
+          "Total": 10
+        }
+      }
+    ]
+  },
+  {
+    "InputRow": {
+      "Name": "Bob",
+      "Amount": "100",
+      "Active": "false"
+    },
+    "Steps": [
+      {
+        "Id": "input",
+        "StepType": "IOInput",
+        "Cells": {
+          "Name": "Bob",
+          "Amount": "100",
+          "Active": "false"
+        }
+      },
+      {
+        "Id": "map",
+        "StepType": "Map",
+        "Cells": {
+          "AgeMultier": 3,
+          "Name": "Bob",
+          "Amount": "100",
+          "IsActive": false
+        }
+      },
+      {
+        "Id": "filter",
+        "StepType": "Filter",
+        "Cells": {
+          "Keep": false
+        }
+      }
+    ]
+  },
+  {
+    "InputRow": {
+      "Name": "Tres",
+      "Amount": "23",
+      "Active": "false"
+    },
+    "Steps": [
+      {
+        "Id": "input",
+        "StepType": "IOInput",
+        "Cells": {
+          "Name": "Tres",
+          "Amount": "23",
+          "Active": "false"
+        }
+      },
+      {
+        "Id": "map",
+        "StepType": "Map",
+        "Cells": {
+          "AgeMultier": 3,
+          "Name": "Tres",
+          "Amount": "23",
+          "IsActive": false
+        }
+      },
+      {
+        "Id": "filter",
+        "StepType": "Filter",
+        "Cells": {
+          "Keep": false
+        }
+      }
+    ]
+  }
+]
