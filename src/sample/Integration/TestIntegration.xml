@@ -34,7 +34,7 @@
                     <WorkCell>
                         <Id>1</Id>
                         <Name>Keep</Name>
-                        <Formula>InputRecord.IsActive</Formula>
+                        <Formula>InputRecord.IsActive = &quot;false&quot;</Formula>
                         <Comments/>
                     </WorkCell>
                 </Cells>
