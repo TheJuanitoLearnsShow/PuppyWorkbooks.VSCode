@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="Mock Data Inline Test">
+    <Steps>
+        <IOInput Id="input1" Kind="SqlReader" ConnectionString="Server=invalid;Database=none;">
+            <MockCsv>
+Name,Active,Amount
+Alice,true,10
+Bob,false,100
+Cara,true,5
+            </MockCsv>
+        </IOInput>
+        <Map Id="map">
+            <Worksheet>
+                <Name>Map</Name>
+                <Cells>
+                    <WorkCell>
+                        <Id>1</Id>
+                        <Name>Total</Name>
+                        <Formula>Value(InputRecord.Amount) * 2</Formula>
+                        <Comments/>
+                    </WorkCell>
+                </Cells>
+            </Worksheet>
+        </Map>
+    </Steps>
+</Integration>

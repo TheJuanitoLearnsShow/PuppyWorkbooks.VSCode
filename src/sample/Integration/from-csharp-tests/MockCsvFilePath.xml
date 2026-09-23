@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="Mock Data File Test">
+    <Steps>
+        <IOInput Id="sqlInput" Kind="SqlReader" ConnectionString="Server=invalid;" MockCsvFilePath="__MOCK_CSV_PATH__" />
+        <Map Id="map">
+            <Worksheet>
+                <Name>Map</Name>
+                <Cells>
+                    <WorkCell>
+                        <Id>1</Id>
+                        <Name>Greeting</Name>
+                        <Formula>"Hello " &amp; InputRecord.Name</Formula>
+                        <Comments/>
+                    </WorkCell>
+                </Cells>
+            </Worksheet>
+        </Map>
+    </Steps>
+</Integration>

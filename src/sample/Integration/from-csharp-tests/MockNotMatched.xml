@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="Mock Not Matched Test">
+    <Steps>
+        <IOInput Id="sqlInput" Kind="SqlReader" ConnectionString="Server=invalid;">
+            <MockCsv>Name,Amount&#10;Alice,10</MockCsv>
+        </IOInput>
+    </Steps>
+</Integration>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="Multiple Mock Formats">
+    <Steps>
+        <IOInput Id="step1" Kind="CSVReader" FilePath="dummy.csv">
+            <MockDataSources>
+                <MockData Name="ScenarioA">
+Name,Amount
+Alice,10
+                </MockData>
+                <MockData Name="ScenarioB" FilePath="SampleFiles/Input1.csv" />
+            </MockDataSources>
+        </IOInput>
+        <IOInput Id="step2" Kind="HttpReader" Endpoint="users">
+            <MockData Name="Scenario1">
+            [{"Id": 1}]
+            </MockData>
+            <MockCsv Name="Scenario2">
+            [{"Id": 2}]
+            </MockCsv>
+        </IOInput>
+    </Steps>
+</Integration>

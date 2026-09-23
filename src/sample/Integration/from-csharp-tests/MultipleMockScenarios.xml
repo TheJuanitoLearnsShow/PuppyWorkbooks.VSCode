@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="Multiple Mock Scenarios Test">
+    <Steps>
+        <IOInput Id="input1" Kind="CSVReader" FilePath="dummy.csv">
+            <MockDataSources>
+                <MockData Name="Small">
+Name,Amount
+Alice,10
+                </MockData>
+                <MockData Name="Large">
+Name,Amount
+Alice,10
+Bob,20
+Cara,30
+                </MockData>
+            </MockDataSources>
+        </IOInput>
+    </Steps>
+</Integration>

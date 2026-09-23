@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="Switch branches">
+    <Steps>
+        <IOInput Id="input" Kind="CSVReader" FilePath="__INPUT_PATH__" />
+<!--        <Map Id="map">-->
+<!--            <Worksheet FilePath="Map.xml"/>-->
+<!--        </Map>-->
+        <!-- issue, switch is not working well, it is not executing per input row and not yielding final results. Actually NO
+          the integration is not supposed to yield results unless sent to IO writer -->
+        <Switch Id="choose">
+            <Worksheet>
+                <Name>Chooser Sheet</Name>
+                <Cells>
+                    <WorkCell>
+                        <Id>1</Id>
+                        <Name>IsActive</Name>
+<!--                        <Formula>InputRecord.IsActive</Formula>-->
+                        <Formula>InputRecord.Active</Formula>
+                    </WorkCell>
+                    <WorkCell>
+                        <Id>2</Id>
+                        <Name>IsInactive</Name>
+                        <Formula>Not(Active)</Formula>
+<!--                        <Formula>Not(IsActive)</Formula>-->
+                    </WorkCell>
+                </Cells>
+            </Worksheet>
+            <Branch WorkCell="IsActive">
+                <Map Id="yes">
+                    <Worksheet>
+                        <Cells>
+                            <WorkCell>
+                                <Id>1</Id>
+                                <Name>Result</Name>
+                                <Formula>InputRecord.Name &amp; &quot;-yes&quot;</Formula>
+                            </WorkCell>
+                        </Cells>
+                    </Worksheet>
+                </Map>
+            </Branch>
+            <Branch WorkCell="IsInactive">
+                <Map Id="no">
+                    <Worksheet>
+                        <Cells>
+                            <WorkCell>
+                                <Id>1</Id>
+                                <Name>Result</Name>
+                                <Formula>InputRecord.Name &amp; &quot;-no&quot;</Formula>
+                            </WorkCell>
+                        </Cells>
+                    </Worksheet>
+                </Map>
+            </Branch>
+        </Switch>
+    </Steps>
+</Integration>

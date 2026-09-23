@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="Mock Sql Output Test">
+    <Steps>
+        <IOInput Id="input1" Kind="SqlReader" ConnectionString="Server=invalid;">
+            <MockCsv>
+Name,Amount
+Alice,10
+            </MockCsv>
+        </IOInput>
+        <IOOutput Id="sqlOut" Kind="SqlWriter" ConnectionString="Server=invalid;" TableName="TargetTable" />
+    </Steps>
+</Integration>

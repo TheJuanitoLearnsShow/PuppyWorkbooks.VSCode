@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="CLI Scenario Test">
+    <Steps>
+        <IOInput Id="sqlInput" Kind="SqlReader" ConnectionString="Server=invalid;">
+            <MockData Name="ScenarioOne">
+Name,Active,Amount
+Alice,true,10
+            </MockData>
+            <MockData Name="ScenarioTwo">
+Name,Active,Amount
+Bob,true,20
+Cara,true,30
+            </MockData>
+        </IOInput>
+        <Map Id="map">
+            <Worksheet>
+                <Name>Map</Name>
+                <Cells>
+                    <WorkCell>
+                        <Id>1</Id>
+                        <Name>Name</Name>
+                        <Formula>InputRecord.Name</Formula>
+                        <Comments/>
+                    </WorkCell>
+                </Cells>
+            </Worksheet>
+        </Map>
+        <IOOutput Id="output" Kind="CSVWriter" FilePath="__OUTPUT_PATH__" />
+    </Steps>
+</Integration>

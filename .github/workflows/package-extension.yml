@@ -33,6 +33,10 @@ jobs:
       - name: Package extension
         run: npx --yes @vscode/vsce package --out puppyworkbookseditor.vsix
 
+      - name: Package integration samples
+        working-directory: src/sample/Integration
+        run: zip -r ../../../samples.zip .
+
       - name: Upload VSIX workflow artifact
         uses: actions/upload-artifact@v4
         with:
@@ -45,4 +49,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: gh release upload "$RELEASE_TAG" puppyworkbookseditor.vsix --clobber
+        run: gh release upload "$RELEASE_TAG" puppyworkbookseditor.vsix ../../samples.zip --clobber

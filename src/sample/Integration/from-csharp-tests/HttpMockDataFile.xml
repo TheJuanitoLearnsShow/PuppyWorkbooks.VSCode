@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="HTTP File Mock Test">
+    <Steps>
+        <IOInput Id="httpInput" Kind="HttpReader" Endpoint="users" JsonPath="$">
+            <MockData Name="FromFile" FilePath="__JSON_FILE_PATH__" />
+        </IOInput>
+    </Steps>
+</Integration>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="Mock Deferred Output Test">
+    <Steps>
+        <IOInput Id="input1" Kind="SqlReader" ConnectionString="Server=invalid;">
+            <MockCsv>
+Name,Amount
+Alice,10
+Bob,20
+            </MockCsv>
+        </IOInput>
+        <Reduce Id="reduce1" OutputField="Sum">
+            <InitialStateJson>0</InitialStateJson>
+            <Worksheet>
+                <Name>Reduce</Name>
+                <Cells>
+                    <WorkCell>
+                        <Id>1</Id>
+                        <Name>Sum</Name>
+                        <Formula>State + Value(InputRecord.Amount)</Formula>
+                        <Comments/>
+                    </WorkCell>
+                </Cells>
+            </Worksheet>
+        </Reduce>
+        <IOOutput Id="output1" Kind="CSVWriter" FilePath="__OUTPUT_PATH__" />
+    </Steps>
+</Integration>

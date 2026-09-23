@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="HTTP Mock Test">
+    <Steps>
+        <IOInput Id="httpInput" Kind="HttpReader" Endpoint="customers" JsonPath="$.data.items">
+            <MockData Name="Default">
+            {
+                "data": {
+                    "items": [
+                        {"Id": 1, "Name": "Alice"}
+                    ]
+                }
+            }
+            </MockData>
+            <MockData Name="MultiCustomer">
+            {
+                "data": {
+                    "items": [
+                        {"Id": 1, "Name": "Alice"},
+                        {"Id": 2, "Name": "Bob"},
+                        {"Id": 3, "Name": "Charlie"}
+                    ]
+                }
+            }
+            </MockData>
+        </IOInput>
+    </Steps>
+</Integration>

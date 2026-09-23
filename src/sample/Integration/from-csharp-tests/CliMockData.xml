@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="CLI Mock Test">
+    <Steps>
+        <IOInput Id="sqlInput" Kind="SqlReader" ConnectionString="Server=invalid;">
+            <MockCsv>
+Name,Active,Amount
+Alice,true,10
+Cara,true,5
+            </MockCsv>
+        </IOInput>
+        <Map Id="map">
+            <Worksheet>
+                <Name>Map</Name>
+                <Cells>
+                    <WorkCell>
+                        <Id>1</Id>
+                        <Name>Name</Name>
+                        <Formula>InputRecord.Name</Formula>
+                        <Comments/>
+                    </WorkCell>
+                    <WorkCell>
+                        <Id>2</Id>
+                        <Name>Amount</Name>
+                        <Formula>Value(InputRecord.Amount)</Formula>
+                        <Comments/>
+                    </WorkCell>
+                </Cells>
+            </Worksheet>
+        </Map>
+        <IOOutput Id="output" Kind="CSVWriter" FilePath="__OUTPUT_PATH__" />
+    </Steps>
+</Integration>

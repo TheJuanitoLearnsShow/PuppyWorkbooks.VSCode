@@ -1,0 +1,11 @@
+<Integration Name="HTTP test">
+  <HttpConfigurations>
+    <HttpConfiguration Name="api" BaseUrl="https://example.test/api/" HttpClientName="integration-api">
+      <Headers><Header Name="X-Integration" Value="Puppy" /></Headers>
+    </HttpConfiguration>
+  </HttpConfigurations>
+  <Steps>
+    <IOInput Id="source" Kind="HttpReader" HttpConfiguration="api" Endpoint="customers" JsonPath="$.data.items" />
+    <IOOutput Id="sink" Kind="HttpWriter" HttpConfiguration="api" Endpoint="archive" PayloadFormat="Json" />
+  </Steps>
+</Integration>

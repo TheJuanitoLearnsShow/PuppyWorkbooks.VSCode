@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="Mock Data Missing Test">
+    <Steps>
+        <IOInput Id="input1" Kind="CSVReader" FilePath="input.csv" />
+    </Steps>
+</Integration>

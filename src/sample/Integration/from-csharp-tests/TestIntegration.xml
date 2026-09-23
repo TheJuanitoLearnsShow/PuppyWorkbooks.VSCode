@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="Sales total">
+    <Steps>
+        <IOInput Id="input" Kind="CSVReader" FilePath="__INPUT_PATH__"/>
+        <Map Id="map">
+            <Worksheet>
+                <Name>Map</Name>
+                <Cells>
+                    <WorkCell>
+                        <Id>1</Id>
+                        <Name>Name</Name>
+                        <Formula>InputRecord.Name</Formula>
+                        <Comments/>
+                    </WorkCell>
+                    <WorkCell>
+                        <Id>2</Id>
+                        <Name>Amount</Name>
+                        <Formula>Value(InputRecord.Amount)</Formula>
+                        <Comments/>
+                    </WorkCell>
+                    <WorkCell>
+                        <Id>3</Id>
+                        <Name>IsActive</Name>
+                        <Formula>InputRecord.Active = &quot;true&quot;</Formula>
+                        <Comments/>
+                    </WorkCell>
+                </Cells>
+            </Worksheet>
+        </Map>
+        <Filter Id="filter">
+            <Worksheet>
+                <Name>Filter</Name>
+                <Cells>
+                    <WorkCell>
+                        <Id>1</Id>
+                        <Name>Keep</Name>
+                        <Formula>InputRecord.IsActive</Formula>
+                        <Comments/>
+                    </WorkCell>
+                </Cells>
+            </Worksheet>
+        </Filter>
+        <Reduce Id="reduce" OutputField="Total">
+            <InitialStateJson>0</InitialStateJson>
+            <Worksheet>
+                <Name>Reduce</Name>
+                <Cells>
+                    <WorkCell>
+                        <Id>1</Id>
+                        <Name>Total</Name>
+                        <Formula>State + InputRecord.Amount</Formula>
+                        <Comments/>
+                    </WorkCell>
+                </Cells>
+            </Worksheet>
+        </Reduce>
+        <IOOutput Id="output" Kind="CSVWriter" FilePath="__OUTPUT_PATH__"/>
+    </Steps>
+</Integration>
