@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Integration Name="Sales total" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="Integration.xsd">
+    xsi:noNamespaceSchemaLocation="schemas/Integration.xsd">
     <Steps>
         <IOInput Id="input" Kind="CSVReader" FilePath="Input1.csv"/>
         <Map Id="map">
@@ -15,5 +15,6 @@
             <Worksheet FilePath="Reduce.xml"/>
         </Reduce>
         <IOOutput Id="output" Kind="CSVWriter" FilePath="Output1.csv"/>
+        
     </Steps>
 </Integration>

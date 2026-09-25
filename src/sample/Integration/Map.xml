@@ -1,28 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <WorkSheet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:noNamespaceSchemaLocation="Map.xsd">
+    xsi:noNamespaceSchemaLocation="schemas/Mapping.xsd">
     <Name>Map</Name>
     <Variables>
-        <Variable><Key>InputRecord</Key><Value>{Name:"Sample",Amount:5,Active:"true"}</Value></Variable>
+        <Variable>
+            <Key>InputRecord</Key>
+            <Value>{Name:"Sample",Amount:5,Active:"true"}</Value>
+        </Variable>
     </Variables>
     <Cells>
         <WorkCell>
             <Id>0</Id>
             <Name>AgeMultier</Name>
             <Formula>3</Formula>
-            <Comments/>
         </WorkCell>
         <WorkCell>
             <Id>1</Id>
             <Name>Name</Name>
             <Formula>InputRecord.Name</Formula>
-            <Comments/>
+            <Comments />
         </WorkCell>
         <WorkCell>
             <Id>2</Id>
             <Name>Amount</Name>
             <Formula>InputRecord.Amount * AgeMultier</Formula>
-            <Comments/>
+            <Comments />
         </WorkCell>
         <WorkCell>
             <Id>3</Id>
@@ -30,7 +32,7 @@
             <Formula><![CDATA[ 
                 InputRecord.Active = "true"
                 ]]></Formula>
-            <Comments/>
+            <Comments />
         </WorkCell>
     </Cells>
 </WorkSheet>

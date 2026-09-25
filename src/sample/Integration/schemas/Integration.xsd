@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:element name="Integration" type="IntegrationType" />
+
+  <xs:complexType name="IntegrationType">
+    <xs:sequence>
+      <xs:element name="HttpConfigurations" type="HttpConfigurationsType" minOccurs="0" />
+      <xs:element name="Steps" type="StepsType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="Name" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <!-- HTTP Configurations -->
+  <xs:complexType name="HttpConfigurationsType">
+    <xs:sequence>
+      <xs:element name="HttpConfiguration" type="HttpConfigurationType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HttpConfigurationType">
+    <xs:sequence>
+      <xs:element name="Headers" type="HttpHeadersType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="Name" type="xs:string" use="required" />
+    <xs:attribute name="BaseUrl" type="xs:string" use="optional" />
+    <xs:attribute name="HttpClientName" type="xs:string" use="optional" />
+    <xs:attribute name="OAuthClientId" type="xs:string" use="optional" />
+    <xs:attribute name="OAuthClientSecret" type="xs:string" use="optional" />
+    <xs:attribute name="OAuthScope" type="xs:string" use="optional" />
+    <xs:attribute name="OAuthTokenUrl" type="xs:string" use="optional" />
+    <xs:attribute name="OAuthHttpClientName" type="xs:string" use="optional" />
+    <xs:attribute name="ClientCertificateThumbprint" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="HttpHeadersType">
+    <xs:sequence>
+      <xs:element name="Header" type="HttpHeaderType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HttpHeaderType">
+    <xs:attribute name="Name" type="xs:string" use="required" />
+    <xs:attribute name="Value" type="xs:string" use="required" />
+  </xs:complexType>
+
+  <!-- Steps Container -->
+  <xs:complexType name="StepsType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="IOInput" type="InputStepType" />
+      <xs:element name="Map" type="MapStepType" />
+      <xs:element name="Filter" type="FilterStepType" />
+      <xs:element name="Reduce" type="ReduceStepType" />
+      <xs:element name="Switch" type="SwitchStepType" />
+      <xs:element name="IOOutput" type="OutputStepType" />
+    </xs:choice>
+  </xs:complexType>
+
+  <!-- Worksheet Types -->
+  <xs:complexType name="VariableType">
+    <xs:sequence>
+      <xs:element name="Key" type="xs:string" minOccurs="0" />
+      <xs:element name="Value" type="xs:string" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="Key" type="xs:string" use="optional" />
+    <xs:attribute name="Value" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="VariablesType">
+    <xs:sequence>
+      <xs:element name="Variable" type="VariableType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="WorkCellType">
+    <xs:sequence>
+      <xs:element name="Id" type="xs:int" minOccurs="0" />
+      <xs:element name="Name" type="xs:string" minOccurs="0" />
+      <xs:element name="Formula" type="xs:string" minOccurs="0" />
+      <xs:element name="Comments" type="xs:string" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="Id" type="xs:int" use="optional" />
+    <xs:attribute name="Name" type="xs:string" use="optional" />
+    <xs:attribute name="Formula" type="xs:string" use="optional" />
+    <xs:attribute name="Comments" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="CellsType">
+    <xs:sequence>
+      <xs:element name="WorkCell" type="WorkCellType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Worksheet Reference or Inline in Steps -->
+  <xs:complexType name="WorksheetStepType" mixed="true">
+    <xs:sequence>
+      <xs:element name="Name" type="xs:string" minOccurs="0" />
+      <xs:element name="Variables" type="VariablesType" minOccurs="0" />
+      <xs:element name="Cells" type="CellsType" minOccurs="0" />
+      <xs:element name="FilePath" type="xs:string" minOccurs="0" />
+      <xs:element name="Path" type="xs:string" minOccurs="0" />
+      <xs:element name="Filename" type="xs:string" minOccurs="0" />
+      <xs:element name="FileName" type="xs:string" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="FilePath" type="xs:string" use="optional" />
+    <xs:attribute name="Path" type="xs:string" use="optional" />
+    <xs:attribute name="File" type="xs:string" use="optional" />
+    <xs:attribute name="Filename" type="xs:string" use="optional" />
+    <xs:attribute name="FileName" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <!-- Mock Data Models -->
+  <xs:complexType name="MockDataType" mixed="true">
+    <xs:sequence>
+      <xs:element name="Name" type="xs:string" minOccurs="0" />
+      <xs:element name="Key" type="xs:string" minOccurs="0" />
+      <xs:element name="Scenario" type="xs:string" minOccurs="0" />
+      <xs:element name="ScenarioName" type="xs:string" minOccurs="0" />
+      <xs:element name="FilePath" type="xs:string" minOccurs="0" />
+      <xs:element name="Path" type="xs:string" minOccurs="0" />
+      <xs:element name="Filename" type="xs:string" minOccurs="0" />
+      <xs:element name="FileName" type="xs:string" minOccurs="0" />
+      <xs:element name="Content" type="xs:string" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="Name" type="xs:string" use="optional" />
+    <xs:attribute name="Key" type="xs:string" use="optional" />
+    <xs:attribute name="Scenario" type="xs:string" use="optional" />
+    <xs:attribute name="ScenarioName" type="xs:string" use="optional" />
+    <xs:attribute name="Id" type="xs:string" use="optional" />
+    <xs:attribute name="FilePath" type="xs:string" use="optional" />
+    <xs:attribute name="Path" type="xs:string" use="optional" />
+    <xs:attribute name="File" type="xs:string" use="optional" />
+    <xs:attribute name="Filename" type="xs:string" use="optional" />
+    <xs:attribute name="FileName" type="xs:string" use="optional" />
+    <xs:attribute name="MockCsvFilePath" type="xs:string" use="optional" />
+    <xs:attribute name="MockFilePath" type="xs:string" use="optional" />
+    <xs:attribute name="MockDataFilePath" type="xs:string" use="optional" />
+    <xs:attribute name="MockPath" type="xs:string" use="optional" />
+    <xs:attribute name="MockCsv" type="xs:string" use="optional" />
+    <xs:attribute name="Content" type="xs:string" use="optional" />
+    <xs:attribute name="RawText" type="xs:string" use="optional" />
+    <xs:attribute name="Text" type="xs:string" use="optional" />
+    <xs:attribute name="Value" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="MockDataSourcesType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="MockData" type="MockDataType" />
+      <xs:element name="MockCsv" type="MockDataType" />
+      <xs:element name="Mock" type="MockDataType" />
+      <xs:element name="MockDataSource" type="MockDataType" />
+      <xs:element name="MockDataEntry" type="MockDataType" />
+      <xs:element name="MockItem" type="MockDataType" />
+    </xs:choice>
+  </xs:complexType>
+
+  <!-- Input Step -->
+  <xs:simpleType name="InputKindType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CSVReader" />
+      <xs:enumeration value="SqlReader" />
+      <xs:enumeration value="HttpReader" />
+      <xs:enumeration value="JsonReader" />
+      <xs:enumeration value="XmlReader" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="InputStepType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="Worksheet" type="WorksheetStepType" />
+      <xs:element name="Query" type="xs:string" />
+      <xs:element name="MockCsv" type="MockDataType" />
+      <xs:element name="MockData" type="MockDataType" />
+      <xs:element name="MockDataSources" type="MockDataSourcesType" />
+      <xs:element name="Mocks" type="MockDataSourcesType" />
+    </xs:choice>
+    <xs:attribute name="Id" type="xs:string" use="optional" />
+    <xs:attribute name="Kind" type="InputKindType" use="optional" />
+    <xs:attribute name="FilePath" type="xs:string" use="optional" />
+    <xs:attribute name="ConnectionString" type="xs:string" use="optional" />
+    <xs:attribute name="TableName" type="xs:string" use="optional" />
+    <xs:attribute name="Query" type="xs:string" use="optional" />
+    <xs:attribute name="MockCsvFilePath" type="xs:string" use="optional" />
+    <xs:attribute name="HttpConfiguration" type="xs:string" use="optional" />
+    <xs:attribute name="Endpoint" type="xs:string" use="optional" />
+    <xs:attribute name="HttpMethod" type="xs:string" use="optional" default="GET" />
+    <xs:attribute name="JsonPath" type="xs:string" use="optional" default="$" />
+    <xs:attribute name="XmlItemElement" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <!-- Map Step -->
+  <xs:complexType name="MapStepType">
+    <xs:sequence>
+      <xs:element name="Worksheet" type="WorksheetStepType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="Id" type="xs:string" use="optional" />
+    <xs:attribute name="OutputField" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <!-- Filter Step -->
+  <xs:complexType name="FilterStepType">
+    <xs:sequence>
+      <xs:element name="Worksheet" type="WorksheetStepType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="Id" type="xs:string" use="optional" />
+    <xs:attribute name="KeepWhenTrue" type="xs:boolean" use="optional" default="true" />
+  </xs:complexType>
+
+  <!-- Reduce Step -->
+  <xs:complexType name="ReduceStepType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="InitialStateJson" type="xs:string" />
+      <xs:element name="Worksheet" type="WorksheetStepType" />
+    </xs:choice>
+    <xs:attribute name="Id" type="xs:string" use="optional" />
+    <xs:attribute name="OutputField" type="xs:string" use="optional" default="State" />
+  </xs:complexType>
+
+  <!-- Switch Step -->
+  <xs:complexType name="SwitchBranchType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="Map" type="MapStepType" />
+      <xs:element name="Filter" type="FilterStepType" />
+      <xs:element name="Reduce" type="ReduceStepType" />
+      <xs:element name="Switch" type="SwitchStepType" />
+      <xs:element name="IOOutput" type="OutputStepType" />
+      <xs:element name="IOInput" type="InputStepType" />
+    </xs:choice>
+    <xs:attribute name="WorkCell" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="SwitchStepType">
+    <xs:sequence>
+      <xs:element name="Worksheet" type="WorksheetStepType" minOccurs="0" />
+      <xs:element name="Branch" type="SwitchBranchType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+    <xs:attribute name="Id" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <!-- Output Step -->
+  <xs:simpleType name="OutputKindType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CSVWriter" />
+      <xs:enumeration value="SqlWriter" />
+      <xs:enumeration value="HttpWriter" />
+      <xs:enumeration value="JsonWriter" />
+      <xs:enumeration value="XmlWriter" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="HttpPayloadFormatType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Json" />
+      <xs:enumeration value="Xml" />
+      <xs:enumeration value="Csv" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="OutputStepType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="Worksheet" type="WorksheetStepType" />
+      <xs:element name="TableName" type="xs:string" />
+      <xs:element name="Query" type="xs:string" />
+    </xs:choice>
+    <xs:attribute name="Id" type="xs:string" use="optional" />
+    <xs:attribute name="Kind" type="OutputKindType" use="optional" />
+    <xs:attribute name="FilePath" type="xs:string" use="optional" />
+    <xs:attribute name="ConnectionString" type="xs:string" use="optional" />
+    <xs:attribute name="TableName" type="xs:string" use="optional" />
+    <xs:attribute name="Query" type="xs:string" use="optional" />
+    <xs:attribute name="HttpConfiguration" type="xs:string" use="optional" />
+    <xs:attribute name="Endpoint" type="xs:string" use="optional" />
+    <xs:attribute name="HttpMethod" type="xs:string" use="optional" default="POST" />
+    <xs:attribute name="PayloadFormat" type="HttpPayloadFormatType" use="optional" default="Json" />
+    <xs:attribute name="XmlRootElement" type="xs:string" use="optional" />
+    <xs:attribute name="XmlRecordElement" type="xs:string" use="optional" />
+  </xs:complexType>
+
+</xs:schema>
