@@ -48,11 +48,26 @@
   <xs:complexType name="StepsType">
     <xs:choice minOccurs="0" maxOccurs="unbounded">
       <xs:element name="IOInput" type="InputStepType" />
+      <xs:element name="CsvInputProvider" type="CsvInputStepType" />
+      <xs:element name="SqlInputProvider" type="SqlInputStepType" />
+      <xs:element name="HttpInputProvider" type="HttpInputStepType" />
+      <xs:element name="JsonInputProvider" type="JsonInputStepType" />
+      <xs:element name="XmlInputProvider" type="XmlInputStepType" />
+      <xs:element name="CsvInput" type="CsvInputStepType" />
+      <xs:element name="SqlInput" type="SqlInputStepType" />
+      <xs:element name="HttpInput" type="HttpInputStepType" />
+      <xs:element name="JsonInput" type="JsonInputStepType" />
+      <xs:element name="XmlInput" type="XmlInputStepType" />
       <xs:element name="Map" type="MapStepType" />
       <xs:element name="Filter" type="FilterStepType" />
       <xs:element name="Reduce" type="ReduceStepType" />
       <xs:element name="Switch" type="SwitchStepType" />
       <xs:element name="IOOutput" type="OutputStepType" />
+      <xs:element name="CsvOutput" type="CsvOutputStepType" />
+      <xs:element name="SqlOutput" type="SqlOutputStepType" />
+      <xs:element name="HttpOutput" type="HttpOutputStepType" />
+      <xs:element name="JsonOutput" type="JsonOutputStepType" />
+      <xs:element name="XmlOutput" type="XmlOutputStepType" />
     </xs:choice>
   </xs:complexType>
 
@@ -188,6 +203,66 @@
     <xs:attribute name="XmlItemElement" type="xs:string" use="optional" />
   </xs:complexType>
 
+  <xs:complexType name="InputProviderCommonType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="MockCsv" type="MockDataType" />
+      <xs:element name="MockData" type="MockDataType" />
+      <xs:element name="MockDataSources" type="MockDataSourcesType" />
+      <xs:element name="Mocks" type="MockDataSourcesType" />
+    </xs:choice>
+    <xs:attribute name="Id" type="xs:string" use="optional" />
+    <xs:attribute name="MockCsvFilePath" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="CsvInputStepType">
+    <xs:complexContent>
+      <xs:extension base="InputProviderCommonType">
+        <xs:attribute name="FilePath" type="xs:string" use="optional" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="SqlInputStepType">
+    <xs:complexContent>
+      <xs:extension base="InputProviderCommonType">
+        <xs:sequence>
+          <xs:element name="Query" type="xs:string" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="ConnectionString" type="xs:string" use="optional" />
+        <xs:attribute name="Query" type="xs:string" use="optional" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="HttpInputStepType">
+    <xs:complexContent>
+      <xs:extension base="InputProviderCommonType">
+        <xs:attribute name="HttpConfiguration" type="xs:string" use="optional" />
+        <xs:attribute name="Endpoint" type="xs:string" use="optional" />
+        <xs:attribute name="HttpMethod" type="xs:string" use="optional" default="GET" />
+        <xs:attribute name="JsonPath" type="xs:string" use="optional" default="$" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="JsonInputStepType">
+    <xs:complexContent>
+      <xs:extension base="InputProviderCommonType">
+        <xs:attribute name="FilePath" type="xs:string" use="optional" />
+        <xs:attribute name="JsonPath" type="xs:string" use="optional" default="$" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="XmlInputStepType">
+    <xs:complexContent>
+      <xs:extension base="InputProviderCommonType">
+        <xs:attribute name="FilePath" type="xs:string" use="optional" />
+        <xs:attribute name="XmlItemElement" type="xs:string" use="optional" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <!-- Map Step -->
   <xs:complexType name="MapStepType">
     <xs:sequence>
@@ -225,6 +300,11 @@
       <xs:element name="Switch" type="SwitchStepType" />
       <xs:element name="IOOutput" type="OutputStepType" />
       <xs:element name="IOInput" type="InputStepType" />
+      <xs:element name="CsvOutput" type="CsvOutputStepType" />
+      <xs:element name="SqlOutput" type="SqlOutputStepType" />
+      <xs:element name="HttpOutput" type="HttpOutputStepType" />
+      <xs:element name="JsonOutput" type="JsonOutputStepType" />
+      <xs:element name="XmlOutput" type="XmlOutputStepType" />
     </xs:choice>
     <xs:attribute name="WorkCell" type="xs:string" use="optional" />
   </xs:complexType>
@@ -274,6 +354,61 @@
     <xs:attribute name="PayloadFormat" type="HttpPayloadFormatType" use="optional" default="Json" />
     <xs:attribute name="XmlRootElement" type="xs:string" use="optional" />
     <xs:attribute name="XmlRecordElement" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="OutputProviderCommonType">
+    <xs:attribute name="Id" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="CsvOutputStepType">
+    <xs:complexContent>
+      <xs:extension base="OutputProviderCommonType">
+        <xs:attribute name="FilePath" type="xs:string" use="optional" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="SqlOutputStepType">
+    <xs:complexContent>
+      <xs:extension base="OutputProviderCommonType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="TableName" type="xs:string" />
+          <xs:element name="Query" type="xs:string" />
+        </xs:choice>
+        <xs:attribute name="ConnectionString" type="xs:string" use="optional" />
+        <xs:attribute name="TableName" type="xs:string" use="optional" />
+        <xs:attribute name="Query" type="xs:string" use="optional" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="HttpOutputStepType">
+    <xs:complexContent>
+      <xs:extension base="OutputProviderCommonType">
+        <xs:attribute name="HttpConfiguration" type="xs:string" use="optional" />
+        <xs:attribute name="Endpoint" type="xs:string" use="optional" />
+        <xs:attribute name="HttpMethod" type="xs:string" use="optional" default="POST" />
+        <xs:attribute name="PayloadFormat" type="HttpPayloadFormatType" use="optional" default="Json" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="JsonOutputStepType">
+    <xs:complexContent>
+      <xs:extension base="OutputProviderCommonType">
+        <xs:attribute name="FilePath" type="xs:string" use="optional" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="XmlOutputStepType">
+    <xs:complexContent>
+      <xs:extension base="OutputProviderCommonType">
+        <xs:attribute name="FilePath" type="xs:string" use="optional" />
+        <xs:attribute name="XmlRootElement" type="xs:string" use="optional" />
+        <xs:attribute name="XmlRecordElement" type="xs:string" use="optional" />
+      </xs:extension>
+    </xs:complexContent>
   </xs:complexType>
 
 </xs:schema>

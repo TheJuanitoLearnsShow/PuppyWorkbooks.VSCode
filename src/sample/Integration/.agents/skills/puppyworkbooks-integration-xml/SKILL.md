@@ -11,9 +11,9 @@ Use this skill to create, modify, inspect, and validate XML integration pipeline
 
 This skill is self-contained: every construct you need is documented inline below. You do not need access to any source repository or sample project. The most common pipeline shapes are:
 
-- **File pipeline**: An `IOInput` reading from CSV/SQL, one or more `Map`/`Filter`/`Reduce` steps referencing external worksheets, and an `IOOutput` sink (see the full structure and step examples below).
+- **File pipeline**: A provider-specific input element such as `<CsvInput>` or `<SqlInput>`, one or more `Map`/`Filter`/`Reduce` steps referencing external worksheets, and a provider-specific output element such as `<CsvOutput>` (see the full structure and step examples below).
 - **Conditional routing**: A `Switch` step with inline worksheet boolean cells and multiple execution `Branch` blocks (see the `Switch` section).
-- **HTTP endpoints**: `HttpReader`/`HttpWriter` steps driven by `<HttpConfigurations>` (see the structure example and `IOInput`/`IOOutput` sections).
+- **HTTP endpoints**: `<HttpInput>`/`<HttpOutput>` steps driven by `<HttpConfigurations>` (see the structure example and input/output sections).
 - **Mock scenarios**: One or more named mock data sources for edge-case and volume testing (see "Defining Mock Data for Testing").
 - **Standalone worksheets**: Map/Filter/Reduce worksheet definitions used within pipeline steps (see the companion `puppyworkbooks-workbook-mapping` skill).
 
@@ -38,15 +38,19 @@ Integration pipelines are declared under a root `<Integration Name="...">` with 
 </Integration>
 ```
 
-The pipeline executes steps in declaration order for each record yielded by the primary `IOInput` (except when `Reduce` is present, which aggregates all records and passes the final state record to subsequent output steps).
+The pipeline executes steps in declaration order for each record yielded by the primary input element (except when `Reduce` is present, which aggregates all records and passes the final state record to subsequent output steps).
 
 ## Step Types & Configuration
 
-### 1. `IOInput` (Input Data Source)
+### 1. Input Provider Elements
 Yields records sequentially into the pipeline.
-- **CSV Reader**: `<IOInput Id="source" Kind="CSVReader" FilePath="data/orders.csv" />`
-- **SQL Reader**: `<IOInput Id="source" Kind="SqlReader" ConnectionString="Server=...;Database=..." Query="SELECT Id, Customer, Amount FROM Orders" />` (or child `<Query>SELECT ...</Query>`)
-- **HTTP Reader**: `<IOInput Id="source" Kind="HttpReader" HttpConfiguration="BillingApi" Endpoint="invoices" JsonPath="$.data.items" HttpMethod="GET" />`
+- **CSV**: `<CsvInput Id="source" FilePath="data/orders.csv" />`
+- **SQL**: `<SqlInput Id="source" ConnectionString="Server=...;Database=..." Query="SELECT Id, Customer, Amount FROM Orders" />` (or child `<Query>SELECT ...</Query>`)
+- **HTTP**: `<HttpInput Id="source" HttpConfiguration="BillingApi" Endpoint="invoices" JsonPath="$.data.items" HttpMethod="GET" />`
+- **JSON file**: `<JsonInput Id="source" FilePath="data/orders.json" JsonPath="$.items" />`
+- **XML file**: `<XmlInput Id="source" FilePath="data/orders.xml" XmlItemElement="Order" />`
+
+Each provider element has its own attributes: file readers use `FilePath`; SQL uses `ConnectionString` and optional `Query`; HTTP uses `HttpConfiguration`, `Endpoint`, `HttpMethod`, and `JsonPath`; JSON uses `FilePath` and `JsonPath`; XML uses `FilePath` and `XmlItemElement`. Input elements may also use `MockCsvFilePath` and mock-data child elements as described below.
 
 ### 2. `Map` (Record Transformation)
 Transforms the incoming record by evaluating a Power Fx worksheet. Each non-empty formula cell becomes a field in the output record matching the cell's `Name`.
@@ -118,7 +122,7 @@ Accumulates state across all input records.
 Evaluates a worksheet for each record and dispatches the record to one or more matching branches.
 - Contains a `<Worksheet>` defining boolean cells and one or more `<Branch WorkCell="CellName">` blocks.
 - All branches whose referenced `WorkCell` evaluates to `true` will execute in XML declaration order.
-- Branches can contain `Map`, `Filter`, `Reduce`, or nested `Switch` steps (cannot contain `IOInput` or `IOOutput`).
+- Branches can contain `Map`, `Filter`, `Reduce`, or nested `Switch` steps; input and output provider steps cannot be nested inside a branch.
 - Example:
   ```xml
   <Switch Id="routeByRegion">
@@ -150,36 +154,38 @@ Evaluates a worksheet for each record and dispatches the record to one or more m
   </Switch>
   ```
 
-### 6. `IOOutput` (Output Destination)
+### 6. Output Provider Elements
 Writes the current record to an external sink and appends status metadata (`<step-id>.Status`, `<step-id>.StatusMessage`, `<step-id>.AffectedRows`).
-- **CSV Writer**: `<IOOutput Id="csvSink" Kind="CSVWriter" FilePath="output/results.csv" />`
-- **JSON Writer**: `<IOOutput Id="jsonSink" Kind="JsonWriter" FilePath="output/results.json" />`
-- **XML Writer**: `<IOOutput Id="xmlSink" Kind="XmlWriter" FilePath="output/results.xml" XmlRootElement="Orders" XmlRecordElement="Order" />`
-- **SQL Writer**: `<IOOutput Id="sqlSink" Kind="SqlWriter" ConnectionString="..." TableName="ProcessedOrders" />` (or with custom `<Query>INSERT INTO ...</Query>`)
-- **HTTP Writer**: `<IOOutput Id="httpSink" Kind="HttpWriter" HttpConfiguration="BillingApi" Endpoint="archive" HttpMethod="POST" PayloadFormat="Json" />`
+- **CSV**: `<CsvOutput Id="csvSink" FilePath="output/results.csv" />`
+- **JSON**: `<JsonOutput Id="jsonSink" FilePath="output/results.json" />`
+- **XML**: `<XmlOutput Id="xmlSink" FilePath="output/results.xml" XmlRootElement="Orders" XmlRecordElement="Order" />`
+- **SQL**: `<SqlOutput Id="sqlSink" ConnectionString="..." TableName="ProcessedOrders" />` (or with custom `Query="INSERT INTO ..."` or child `<Query>INSERT INTO ...</Query>`)
+- **HTTP**: `<HttpOutput Id="httpSink" HttpConfiguration="BillingApi" Endpoint="archive" HttpMethod="POST" PayloadFormat="Json" />`
+
+Each output element accepts only attributes that apply to its provider: file writers use `FilePath`; SQL uses `ConnectionString`, `TableName`, and optional `Query`; HTTP uses `HttpConfiguration`, `Endpoint`, `HttpMethod`, and `PayloadFormat`; XML uses `FilePath`, `XmlRootElement`, and `XmlRecordElement`.
 
 ---
 
 ## Defining Mock Data for Testing
 
-To safely test integrations without external databases, network calls, or input files, define mock data on `IOInput` steps:
+To safely test integrations without external databases, network calls, or input files, define mock data on input provider elements:
 
 ### 1. Inline Mock CSV
 ```xml
-<IOInput Id="source" Kind="CSVReader" FilePath="production/path.csv">
+<CsvInput Id="source" FilePath="production/path.csv">
   <MockCsv>
 Id,Customer,Amount,Status
 101,Acme Corp,250.00,Active
 102,Beta LLC,120.50,Inactive
 103,Gamma Inc,85.00,Active
   </MockCsv>
-</IOInput>
+</CsvInput>
 ```
 
 ### 2. Named Mock Scenarios
 Define multiple scenarios within `<MockDataSources>` for edge-case and volume testing:
 ```xml
-<IOInput Id="source" Kind="CSVReader" FilePath="data.csv">
+<CsvInput Id="source" FilePath="data.csv">
   <MockDataSources>
     <MockData Name="Standard">
 Id,Amount,Status
@@ -192,19 +198,19 @@ Id,Amount,Status
 3,500,Exempt
     </MockData>
   </MockDataSources>
-</IOInput>
+</CsvInput>
 ```
 
 ### 3. External Mock Files
-Use the `MockCsvFilePath` attribute on `IOInput` or `FilePath` attribute on `<MockData>`:
+Use the `MockCsvFilePath` attribute on an input element or `FilePath` attribute on `<MockData>`:
 ```xml
-<IOInput Id="source" Kind="CSVReader" FilePath="data.csv" MockCsvFilePath="testdata/mock_orders.csv" />
+<CsvInput Id="source" FilePath="data.csv" MockCsvFilePath="testdata/mock_orders.csv" />
 ```
 
 ### 4. HTTP Reader Mock JSON
-For `Kind="HttpReader"`, provide mock JSON inline or via file path:
+For `<HttpInput>`, provide mock JSON inline or via file path:
 ```xml
-<IOInput Id="apiSource" Kind="HttpReader" HttpConfiguration="BillingApi" Endpoint="users" JsonPath="$.items">
+<HttpInput Id="apiSource" HttpConfiguration="BillingApi" Endpoint="users" JsonPath="$.items">
   <MockData>
     {
       "items": [
@@ -213,7 +219,7 @@ For `Kind="HttpReader"`, provide mock JSON inline or via file path:
       ]
     }
   </MockData>
-</IOInput>
+</HttpInput>
 ```
 
 ---
@@ -237,6 +243,6 @@ puppyworkbooks path/to/integration.xml --use-mock-data-for-steps source --debug
 ```
 
 ### Mock Execution Behavior
-- When an `IOInput` step runs under mock mode, it supplies records from its configured inline mock data or mock file.
-- When an `IOOutput` step runs under mock mode (or when `--use-mock-data-for-steps ALL` is specified), output writing uses an in-memory mock provider so no disk files or remote databases are altered.
+- When an input provider step runs under mock mode, it supplies records from its configured inline mock data or mock file.
+- When an output provider step runs under mock mode (or when `--use-mock-data-for-steps ALL` is specified), output writing uses an in-memory mock provider so no disk files or remote databases are altered.
 - `--debug` outputs formatted JSON showing every step's input record, intermediate cell calculations, and filter/branch evaluation results.

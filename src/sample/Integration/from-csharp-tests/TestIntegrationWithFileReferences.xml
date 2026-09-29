@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Integration Name="Sales total">
     <Steps>
-        <IOInput Id="input" Kind="CSVReader" FilePath="__INPUT_PATH__"/>
+        <CsvInput Id="input" FilePath="__INPUT_PATH__"/>
         <Map Id="map">
             <Worksheet FilePath="Map.xml"/>
         </Map>
@@ -12,6 +12,6 @@
             <InitialStateJson>0</InitialStateJson>
             <Worksheet FilePath="Reduce.xml"/>
         </Reduce>
-        <IOOutput Id="output" Kind="CSVWriter" FilePath="__OUTPUT_PATH__"/>
+        <CsvOutput Id="output" FilePath="__OUTPUT_PATH__"/>
     </Steps>
 </Integration>

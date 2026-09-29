@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Integration Name="Scenario Fallback Test">
     <Steps>
-        <IOInput Id="input1" Kind="SqlReader" ConnectionString="Server=invalid;">
+        <SqlInput Id="input1" ConnectionString="Server=invalid;">
             <MockData Name="Primary">
 Name,Amount
 Alice,10
@@ -11,6 +11,6 @@ Bob,20
 Name,Amount
 Cara,30
             </MockData>
-        </IOInput>
+        </SqlInput>
     </Steps>
 </Integration>

@@ -1,14 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Integration Name="Mock Data Inline Test">
     <Steps>
-        <IOInput Id="input1" Kind="SqlReader" ConnectionString="Server=invalid;Database=none;">
+        <SqlInput Id="input1" ConnectionString="Server=invalid;Database=none;">
             <MockCsv>
 Name,Active,Amount
 Alice,true,10
 Bob,false,100
 Cara,true,5
             </MockCsv>
-        </IOInput>
+        </SqlInput>
         <Map Id="map">
             <Worksheet>
                 <Name>Map</Name>
