@@ -1,0 +1,7 @@
+<Integration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/Integration.xsd" Name="AdditionalInput">
+  <Steps>
+    <CsvInput Id="source" FilePath="SampleData/AdditionalInput.csv" />
+    <CsvInput Id="lookup" FilePath="{{ InputRecord.LookupPath }}" />
+    <CsvOutput Id="sink" FilePath="testAdditionalInput.csv" />
+  </Steps>
+</Integration>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Integration Name="Sales total">
+<Integration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schemas/Integration.xsd" Name="Sales total">
     <Steps>
         <IOInput Id="input" Kind="CSVReader" FilePath="Input1.csv"/>
         <Map Id="map">

@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Integration Name="Mock Not Matched Test">
+<?xml version="1.0" encoding="utf-8"?>
+<Integration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/Integration.xsd" Name="Mock Not Matched Test">
     <Steps>
         <SqlInput Id="sqlInput" ConnectionString="Server=invalid;">
             <MockCsv>Name,Amount&#10;Alice,10</MockCsv>

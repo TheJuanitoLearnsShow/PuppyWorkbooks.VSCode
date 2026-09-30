@@ -1,0 +1,3 @@
+﻿LookupPath,ParentId,Shared
+SampleData/FirstLookup.csv,P1,parent-one
+SampleData/SecondLookup.csv,P2,parent-two

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Integration Name="Multiple Mock Formats"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="schemas/Integration.xsd">
+<Integration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schemas/Integration.xsd" Name="Multiple Mock Formats">
     <Steps>
         <IOInput Id="step1" Kind="CSVReader" FilePath="dummy.csv">
             <MockDataSources>

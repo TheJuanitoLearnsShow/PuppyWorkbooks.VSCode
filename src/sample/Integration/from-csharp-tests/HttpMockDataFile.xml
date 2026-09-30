@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Integration Name="HTTP File Mock Test">
+<?xml version="1.0" encoding="utf-8"?>
+<Integration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/Integration.xsd" Name="HTTP File Mock Test">
     <Steps>
         <HttpInput Id="httpInput" Endpoint="users" JsonPath="$">
             <MockData Name="FromFile" FilePath="__JSON_FILE_PATH__" />

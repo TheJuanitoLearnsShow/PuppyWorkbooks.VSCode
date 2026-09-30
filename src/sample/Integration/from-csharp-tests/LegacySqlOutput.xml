@@ -1,0 +1,8 @@
+<Integration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/Integration.xsd">
+  <Steps>
+    <IOOutput Id="legacy" Kind="SqlWriter" ConnectionString="legacy-connection">
+      <TableName>LegacyResults</TableName>
+      <Query>SELECT 1</Query>
+    </IOOutput>
+  </Steps>
+</Integration>

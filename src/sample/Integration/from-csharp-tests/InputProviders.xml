@@ -1,0 +1,14 @@
+<Integration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/Integration.xsd" Name="Providers">
+  <HttpConfigurations>
+    <HttpConfiguration Name="api" BaseUrl="https://example.test/" />
+  </HttpConfigurations>
+  <Steps>
+    <CsvInput Id="csv" FilePath="data.csv" />
+    <SqlInput Id="sql" ConnectionString="connection">
+      <Query>SELECT 1</Query>
+    </SqlInput>
+    <HttpInput Id="http" HttpConfiguration="api" Endpoint="items" HttpMethod="POST" JsonPath="$.items" />
+    <JsonInput Id="json" FilePath="data.json" JsonPath="$.items" />
+    <XmlInput Id="xml" FilePath="data.xml" XmlItemElement="Item" />
+  </Steps>
+</Integration>

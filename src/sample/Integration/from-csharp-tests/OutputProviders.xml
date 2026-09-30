@@ -1,0 +1,12 @@
+<Integration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/Integration.xsd" Name="Providers">
+  <HttpConfigurations>
+    <HttpConfiguration Name="api" BaseUrl="https://example.test/" />
+  </HttpConfigurations>
+  <Steps>
+    <CsvOutput Id="csv" FilePath="data.csv" />
+    <SqlOutput Id="sql" ConnectionString="connection" TableName="Results" Query="INSERT INTO Results VALUES (1)" />
+    <HttpOutput Id="http" HttpConfiguration="api" Endpoint="items" HttpMethod="PUT" PayloadFormat="Xml" />
+    <JsonOutput Id="json" FilePath="data.json" />
+    <XmlOutput Id="xml" FilePath="data.xml" XmlRootElement="Items" XmlRecordElement="Item" />
+  </Steps>
+</Integration>
