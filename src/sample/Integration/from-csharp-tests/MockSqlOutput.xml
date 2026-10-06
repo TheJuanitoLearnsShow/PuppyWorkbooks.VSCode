@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Integration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/Integration.xsd" Name="Mock Sql Output Test">
+    <SecretManager>
+        <EnvSecret SecretName='MySecret' EnvVarName='TEST_SECRET' />
+    </SecretManager>
     <Steps>
-        <SqlInput Id="input1" ConnectionString="Server=invalid;">
+        <SqlInput Id="input1" ConnectionString="Server={{ secrets.MySecret }};">
             <MockCsv>
 Name,Amount
 Alice,10

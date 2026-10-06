@@ -6,6 +6,7 @@
   <xs:complexType name="IntegrationType">
     <xs:sequence>
       <xs:element name="HttpConfigurations" type="HttpConfigurationsType" minOccurs="0" />
+      <xs:element name="SecretManager" type="SecretManagerType" minOccurs="0" />
       <xs:element name="Steps" type="StepsType" minOccurs="0" />
     </xs:sequence>
     <xs:attribute name="Name" type="xs:string" use="optional" />
@@ -42,6 +43,45 @@
   <xs:complexType name="HttpHeaderType">
     <xs:attribute name="Name" type="xs:string" use="required" />
     <xs:attribute name="Value" type="xs:string" use="required" />
+  </xs:complexType>
+
+  <!-- Secret Management -->
+  <xs:complexType name="SecretManagerType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="WindowsCredentialsSecret" type="WindowsCredentialsSecretType" />
+      <xs:element name="KeyVaultCredential" type="KeyVaultCredentialType" />
+      <xs:element name="EnvSecret" type="EnvSecretType" />
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="SecretDefinitionType">
+    <xs:attribute name="SecretName" type="xs:string" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="WindowsCredentialsSecretType">
+    <xs:complexContent>
+      <xs:extension base="SecretDefinitionType">
+        <xs:attribute name="CredentialTargetName" type="xs:string" use="required" />
+        <xs:attribute name="UsernameToSecretName" type="xs:string" use="required" />
+        <xs:attribute name="PasswordToSecretName" type="xs:string" use="required" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="KeyVaultCredentialType">
+    <xs:complexContent>
+      <xs:extension base="SecretDefinitionType">
+        <xs:attribute name="SecretURI" type="xs:string" use="required" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="EnvSecretType">
+    <xs:complexContent>
+      <xs:extension base="SecretDefinitionType">
+        <xs:attribute name="EnvVarName" type="xs:string" use="required" />
+      </xs:extension>
+    </xs:complexContent>
   </xs:complexType>
 
   <!-- Steps Container -->
