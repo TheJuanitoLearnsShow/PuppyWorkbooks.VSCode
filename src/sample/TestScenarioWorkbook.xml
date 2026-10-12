@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WorkSheet>
+  <Name>ScenarioWorkbook</Name>
+  <Variables>
+    <Variable>
+      <Key>Multiplier</Key>
+      <Value>2</Value>
+    </Variable>
+  </Variables>
+  <Cells>
+    <WorkCell>
+      <Id>1</Id>
+      <Name>Total</Name>
+      <Formula>5 * Multiplier</Formula>
+      <Comments>Applies the configured multiplier.</Comments>
+    </WorkCell>
+  </Cells>
+  <TestScenarios>
+    <TestScenario Name="TripleMultiplier">
+      <Inputs>
+        <Variable>
+          <Key>Multiplier</Key>
+          <Value>3</Value>
+        </Variable>
+      </Inputs>
+      <ExpectedCells>
+        <Cell>
+          <Name>Total</Name>
+          <Value>15</Value>
+        </Cell>
+      </ExpectedCells>
+    </TestScenario>
+  </TestScenarios>
+</WorkSheet>

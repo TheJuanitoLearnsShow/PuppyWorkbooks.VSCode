@@ -9,6 +9,7 @@
       <xs:element name="Name" type="xs:string" minOccurs="0" />
       <xs:element name="Variables" type="VariablesType" minOccurs="0" />
       <xs:element name="Cells" type="CellsType" minOccurs="0" />
+      <xs:element name="TestScenarios" type="TestScenariosType" />
     </xs:sequence>
   </xs:complexType>
 
@@ -44,6 +45,33 @@
     <xs:attribute name="Name" type="xs:string" use="optional" />
     <xs:attribute name="Formula" type="xs:string" use="optional" />
     <xs:attribute name="Comments" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="TestScenariosType">
+    <xs:sequence>
+      <xs:element name="TestScenario" type="TestScenarioType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TestScenarioType">
+    <xs:sequence>
+      <xs:element name="Inputs" type="VariablesType" minOccurs="0" />
+      <xs:element name="ExpectedCells" type="ExpectedCellsType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="Name" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="ExpectedCellsType">
+    <xs:sequence>
+      <xs:element name="Cell" type="ExpectedCellType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ExpectedCellType">
+    <xs:sequence>
+      <xs:element name="Name" type="xs:string" minOccurs="0" />
+      <xs:element name="Value" type="xs:string" minOccurs="0" />
+    </xs:sequence>
   </xs:complexType>
 
 </xs:schema>
