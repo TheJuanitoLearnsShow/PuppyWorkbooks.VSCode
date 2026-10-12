@@ -7,10 +7,12 @@
   <xs:complexType name="WorkSheetType">
     <xs:sequence>
       <xs:element name="Name" type="xs:string" minOccurs="0" />
+      <xs:element name="Comments" type="xs:string" minOccurs="1" />
       <xs:element name="Variables" type="VariablesType" minOccurs="0" />
       <xs:element name="Cells" type="CellsType" minOccurs="0" />
-      <xs:element name="TestScenarios" type="TestScenariosType" />
+      <xs:element name="TestScenarios" type="TestScenariosType" minOccurs="1" />
     </xs:sequence>
+    <xs:attribute name="Comments" type="xs:string" use="optional" />
   </xs:complexType>
 
   <xs:complexType name="VariablesType">
@@ -39,7 +41,9 @@
       <xs:element name="Id" type="xs:int" minOccurs="0" />
       <xs:element name="Name" type="xs:string" minOccurs="0" />
       <xs:element name="Formula" type="xs:string" minOccurs="0" />
-      <xs:element name="Comments" type="xs:string" minOccurs="0" />
+      <xs:choice minOccurs="1" maxOccurs="1">
+        <xs:element name="Comments" type="xs:string" />
+      </xs:choice>
     </xs:sequence>
     <xs:attribute name="Id" type="xs:int" use="optional" />
     <xs:attribute name="Name" type="xs:string" use="optional" />
