@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="Sales total"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="../../Schemas/Integration.xsd">
+    <Comments>This is a sample integration for testing SQL output functionality.</Comments>
+    <Steps>
+        <CsvInput Id="input" FilePath="SampleFiles/Integration/SampleData/Episodes.csv"/>
+        <!-- paths relative to the bin folder, not the path of the integration file -->
+        
+        <Map Id="Map Episodes">
+            <Worksheet>
+                <Cells>
+                    <WorkCell>
+                        <Name>Title</Name>
+                        <Formula>InputRecord.Title</Formula>
+                        <Comments/>
+                    </WorkCell>
+                    <WorkCell>
+                        <Name>InitialDescription</Name>
+                        <Formula>InputRecord.InitialDescription</Formula>
+                        <Comments/>
+                    </WorkCell>
+                    <WorkCell>
+                        <Name>FilePath</Name>
+                        <Formula>&quot;c:\path\to\file.mp3&quot;</Formula>
+                        <Comments/>
+                    </WorkCell>
+                </Cells>
+            </Worksheet>
+        </Map>
+
+        <SqlOutput Id="sqlEpisodes" ConnectionString="Data Source=.\sqlexpress;Initial Catalog=AutomatedTESTS_PodcastsManager;Integrated Security=True;Encrypt=True;TrustServerCertificate=True;" 
+                   CommandType="StoredProcedure" Query="[api].[spPublishEpisode]" >
+            <SqlParam Name="Title" FromField="Title"/>
+            <SqlParam Name="Description" FromField="InitialDescription"/>
+            <SqlParam Name="AudioFilePath" FromField="FilePath"/>
+        </SqlOutput>
+    </Steps>
+</Integration>

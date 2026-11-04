@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="Sales total"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="../../Schemas/Integration.xsd">
+    <Comments>Sample that reads file paths from a folder</Comments>
+    <Steps>
+        <FileSystemInput Id="input" 
+                         FilePath="../SampleData/FileEnumeration"
+        /> <!-- paths relative to the bin folder, not the path of the integration file -->
+        
+        <CsvInput Id="csvInput" FilePathFromField="FilePath"/>
+        
+        <Reduce Id="reduce" OutputField="Total">
+            <InitialStateJson>0</InitialStateJson>
+            <Worksheet FilePath="Reduce.xml"/>
+        </Reduce>
+        <CsvOutput Id="output" FilePath="FileEnumerationTotals.csv"/>
+    </Steps>
+</Integration>

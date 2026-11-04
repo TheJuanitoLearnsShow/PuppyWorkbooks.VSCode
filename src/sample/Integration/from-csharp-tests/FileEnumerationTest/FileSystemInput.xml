@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Integration Name="File system input">
+  <Steps>
+    <IOInput Id="source" Kind="FileSystemReader" FilePath="data" AddFileSizeField="true" AddCreatedOnDate="true" AddLastModifiedDateField="true" />
+    <FileSystemInput Id="dedicatedSource" FilePath="data" AddFileSizeField="true" AddCreatedOnDate="true" AddLastModifiedDateField="true" />
+  </Steps>
+</Integration>

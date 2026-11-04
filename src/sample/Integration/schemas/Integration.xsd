@@ -5,6 +5,7 @@
 
   <xs:complexType name="IntegrationType">
     <xs:sequence>
+      <xs:element name="Comments" type="xs:string" minOccurs="1" maxOccurs="1" />
       <xs:element name="HttpConfigurations" type="HttpConfigurationsType" minOccurs="0" />
       <xs:element name="SecretManager" type="SecretManagerType" minOccurs="0" />
       <xs:element name="Steps" type="StepsType" minOccurs="0" />
@@ -101,6 +102,7 @@
       <xs:element name="JsonInput" type="JsonInputStepType" />
       <xs:element name="XmlInput" type="XmlInputStepType" />
       <xs:element name="FileSystemInput" type="FileSystemInputStepType" />
+      <xs:element name="ServiceBusInput" type="ServiceBusInputStepType" />
       <xs:element name="RunIntegration" type="RunIntegrationStepType" />
       <xs:element name="Map" type="MapStepType" />
       <xs:element name="Filter" type="FilterStepType" />
@@ -310,6 +312,19 @@
         <xs:attribute name="HttpMethod" type="xs:string" use="optional" default="GET" />
         <xs:attribute name="JsonPath" type="xs:string" use="optional" default="$" />
         <xs:attribute name="JsonPathFromField" type="xs:string" use="optional" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ServiceBusInputStepType">
+    <xs:complexContent>
+      <xs:extension base="InputProviderCommonType">
+        <xs:attribute name="ConnectionString" type="xs:string" use="optional" />
+        <xs:attribute name="ConnectionStringFromField" type="xs:string" use="optional" />
+        <xs:attribute name="TopicName" type="xs:string" use="optional" />
+        <xs:attribute name="TopicNameFromField" type="xs:string" use="optional" />
+        <xs:attribute name="SubscriptionName" type="xs:string" use="optional" />
+        <xs:attribute name="SubscriptionNameFromField" type="xs:string" use="optional" />
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

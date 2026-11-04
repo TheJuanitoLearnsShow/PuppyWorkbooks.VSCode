@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WorkSheet>
+    <Name>Reduce</Name>
+    <Variables>
+        <Variable><Key>InputRecord</Key><Value>{Price:20, ProductId:Meat }</Value></Variable>
+        <Variable><Key>State</Key><Value>0</Value></Variable>
+    </Variables>
+    <Cells>
+        <WorkCell>
+            <Id>1</Id>
+            <Name>Total</Name>
+            <Formula>State + InputRecord.Price</Formula>
+            <Comments/>
+        </WorkCell>
+    </Cells>
+  <TestScenarios />
+</WorkSheet>
