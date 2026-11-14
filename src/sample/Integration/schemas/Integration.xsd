@@ -1,567 +1,2007 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
-  <xs:element name="Integration" type="IntegrationType" />
+  <!-- ========================================================================= -->
+  <!-- Root Integration Element and Main Definition Type                        -->
+  <!-- ========================================================================= -->
+
+  <xs:element name="Integration" type="IntegrationType">
+    <xs:annotation>
+      <xs:documentation>Root element representing a PuppyWorkbooks integration pipeline definition.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
 
   <xs:complexType name="IntegrationType">
+    <xs:annotation>
+      <xs:documentation>Top-level definition containing optional metadata, HTTP configurations, secret management, and pipeline execution steps.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="Comments" type="xs:string" minOccurs="1" maxOccurs="1" />
-      <xs:element name="HttpConfigurations" type="HttpConfigurationsType" minOccurs="0" />
-      <xs:element name="SecretManager" type="SecretManagerType" minOccurs="0" />
-      <xs:element name="Steps" type="StepsType" minOccurs="0" />
+      <xs:element name="Comments" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Optional human-readable notes, comments, or documentation describing the purpose of the integration.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="HttpConfigurations" type="HttpConfigurationsType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Container for reusable named HTTP endpoint configurations, headers, and OAuth/certificate authentication settings.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="SecretManager" type="SecretManagerType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Container for secret provider definitions (Windows Credential Manager, Azure Key Vault, Environment variables).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Steps" type="StepsType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Ordered sequence of pipeline execution steps including input readers, transformations, child integrations, routing, and output writers.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
-    <xs:attribute name="Name" type="xs:string" use="optional" />
+    <xs:attribute name="Name" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Logical name identifying the integration definition.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
-  <!-- HTTP Configurations -->
+  <!-- ========================================================================= -->
+  <!-- HTTP Configurations                                                       -->
+  <!-- ========================================================================= -->
+
   <xs:complexType name="HttpConfigurationsType">
+    <xs:annotation>
+      <xs:documentation>Collection of named HTTP configurations that can be referenced by HTTP input and output steps.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="HttpConfiguration" type="HttpConfigurationType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="HttpConfiguration" type="HttpConfigurationType" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Individual reusable HTTP client configuration including base URL, authentication, and default request headers.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="HttpConfigurationType">
+    <xs:annotation>
+      <xs:documentation>Configuration settings for HTTP client interactions, supporting OAuth 2.0 client credentials, certificate authentication, and custom headers.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="Headers" type="HttpHeadersType" minOccurs="0" />
+      <xs:element name="Headers" type="HttpHeadersType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Optional collection of default HTTP request headers sent with requests using this configuration.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
-    <xs:attribute name="Name" type="xs:string" use="required" />
-    <xs:attribute name="BaseUrl" type="xs:string" use="optional" />
-    <xs:attribute name="BaseUrlFromField" type="xs:string" use="optional" />
-    <xs:attribute name="HttpClientName" type="xs:string" use="optional" />
-    <xs:attribute name="OAuthClientId" type="xs:string" use="optional" />
-    <xs:attribute name="OAuthClientIdFromField" type="xs:string" use="optional" />
-    <xs:attribute name="OAuthClientSecret" type="xs:string" use="optional" />
-    <xs:attribute name="OAuthClientSecretFromField" type="xs:string" use="optional" />
-    <xs:attribute name="OAuthScope" type="xs:string" use="optional" />
-    <xs:attribute name="OAuthScopeFromField" type="xs:string" use="optional" />
-    <xs:attribute name="OAuthTokenUrl" type="xs:string" use="optional" />
-    <xs:attribute name="OAuthTokenUrlFromField" type="xs:string" use="optional" />
-    <xs:attribute name="OAuthHttpClientName" type="xs:string" use="optional" />
-    <xs:attribute name="ClientCertificateThumbprint" type="xs:string" use="optional" />
-    <xs:attribute name="ClientCertificateThumbprintFromField" type="xs:string" use="optional" />
+    <xs:attribute name="Name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Unique name identifying this HTTP configuration, referenced by HttpInput and HttpOutput steps.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="BaseUrl" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Base URL for HTTP requests (e.g., 'https://api.example.com/v1/').</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="BaseUrlFromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Name of the record field from which to dynamically bind the base URL.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="HttpClientName" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Name of the pre-configured HttpClient registered in the host dependency-injection IHttpClientFactory.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="OAuthClientId" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Client ID used for OAuth 2.0 client credentials token acquisition.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="OAuthClientIdFromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Name of the record field from which to dynamically bind the OAuth Client ID.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="OAuthClientSecret" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Client Secret used for OAuth 2.0 client credentials token acquisition (supports secret placeholders).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="OAuthClientSecretFromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Name of the record field from which to dynamically bind the OAuth Client Secret.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="OAuthScope" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Scope(s) requested when acquiring OAuth 2.0 access tokens.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="OAuthScopeFromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Name of the record field from which to dynamically bind the OAuth Scope.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="OAuthTokenUrl" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>URL of the OAuth 2.0 token endpoint for client credentials grant.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="OAuthTokenUrlFromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Name of the record field from which to dynamically bind the OAuth Token URL.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="OAuthHttpClientName" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Name of the HttpClient instance to use when requesting OAuth access tokens.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ClientCertificateThumbprint" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>SHA-1 thumbprint of the client certificate loaded from the Windows Personal certificate store.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ClientCertificateThumbprintFromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Name of the record field from which to dynamically bind the client certificate thumbprint.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="HttpHeadersType">
+    <xs:annotation>
+      <xs:documentation>Collection of HTTP headers.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="Header" type="HttpHeaderType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="Header" type="HttpHeaderType" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Individual HTTP header definition.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="HttpHeaderType">
-    <xs:attribute name="Name" type="xs:string" use="required" />
-    <xs:attribute name="Value" type="xs:string" use="optional" />
-    <xs:attribute name="ValueFromField" type="xs:string" use="optional" />
+    <xs:annotation>
+      <xs:documentation>HTTP header key-value pair definition.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="Name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Header name (e.g., 'Authorization', 'Accept', 'X-Source').</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Value" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Static value of the HTTP header.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ValueFromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Name of the record field from which to dynamically bind the header value.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
-  <!-- Secret Management -->
+  <!-- ========================================================================= -->
+  <!-- Secret Management                                                         -->
+  <!-- ========================================================================= -->
+
   <xs:complexType name="SecretManagerType">
+    <xs:annotation>
+      <xs:documentation>Container for configuring secret resolvers to securely populate placeholders such as '{{ secrets.SecretName }}'.</xs:documentation>
+    </xs:annotation>
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="WindowsCredentialsSecret" type="WindowsCredentialsSecretType" />
-      <xs:element name="KeyVaultCredential" type="KeyVaultCredentialType" />
-      <xs:element name="EnvSecret" type="EnvSecretType" />
+      <xs:element name="WindowsCredentialsSecret" type="WindowsCredentialsSecretType">
+        <xs:annotation>
+          <xs:documentation>Resolves secrets from the Windows Credential Manager.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="KeyVaultCredential" type="KeyVaultCredentialType">
+        <xs:annotation>
+          <xs:documentation>Resolves secrets from Azure Key Vault using a secret URI.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="EnvSecret" type="EnvSecretType">
+        <xs:annotation>
+          <xs:documentation>Resolves secrets from system/process environment variables.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:choice>
   </xs:complexType>
 
   <xs:complexType name="SecretDefinitionType">
-    <xs:attribute name="SecretName" type="xs:string" use="required" />
+    <xs:annotation>
+      <xs:documentation>Base type for secret resolver definitions.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="SecretName" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Logical name or alias assigned to the secret, referenced via '{{ secrets.SecretName }}'.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="WindowsCredentialsSecretType">
+    <xs:annotation>
+      <xs:documentation>Secret resolver that retrieves username and password from Windows Credential Manager.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="SecretDefinitionType">
-        <xs:attribute name="CredentialTargetName" type="xs:string" use="required" />
-        <xs:attribute name="UsernameToSecretName" type="xs:string" use="required" />
-        <xs:attribute name="PasswordToSecretName" type="xs:string" use="required" />
+        <xs:attribute name="CredentialTargetName" type="xs:string" use="required">
+          <xs:annotation>
+            <xs:documentation>Target name of the generic credential stored in Windows Credential Manager.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="UsernameToSecretName" type="xs:string" use="required">
+          <xs:annotation>
+            <xs:documentation>Secret alias assigned to the retrieved username.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="PasswordToSecretName" type="xs:string" use="required">
+          <xs:annotation>
+            <xs:documentation>Secret alias assigned to the retrieved password.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="KeyVaultCredentialType">
+    <xs:annotation>
+      <xs:documentation>Secret resolver that retrieves a secret from Azure Key Vault.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="SecretDefinitionType">
-        <xs:attribute name="SecretURI" type="xs:string" use="required" />
+        <xs:attribute name="SecretURI" type="xs:string" use="required">
+          <xs:annotation>
+            <xs:documentation>Full URI of the Azure Key Vault secret (e.g., 'https://myvault.vault.azure.net/secrets/mysecret').</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="EnvSecretType">
+    <xs:annotation>
+      <xs:documentation>Secret resolver that retrieves a secret value from an environment variable.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="SecretDefinitionType">
-        <xs:attribute name="EnvVarName" type="xs:string" use="required" />
+        <xs:attribute name="EnvVarName" type="xs:string" use="required">
+          <xs:annotation>
+            <xs:documentation>Name of the environment variable containing the secret value.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
-  <!-- Steps Container -->
+  <!-- ========================================================================= -->
+  <!-- Steps Container                                                           -->
+  <!-- ========================================================================= -->
+
   <xs:complexType name="StepsType">
+    <xs:annotation>
+      <xs:documentation>Ordered collection of integration steps executed sequentially in declaration order.</xs:documentation>
+    </xs:annotation>
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="MemoryInput" type="MemoryInputStepType" />
-      <xs:element name="CsvInput" type="CsvInputStepType" />
-      <xs:element name="SqlInput" type="SqlInputStepType" />
-      <xs:element name="HttpInput" type="HttpInputStepType" />
-      <xs:element name="JsonInput" type="JsonInputStepType" />
-      <xs:element name="XmlInput" type="XmlInputStepType" />
-      <xs:element name="FileSystemInput" type="FileSystemInputStepType" />
-      <xs:element name="ServiceBusInput" type="ServiceBusInputStepType" />
-      <xs:element name="RunIntegration" type="RunIntegrationStepType" />
-      <xs:element name="Map" type="MapStepType" />
-      <xs:element name="Filter" type="FilterStepType" />
-      <xs:element name="Reduce" type="ReduceStepType" />
-      <xs:element name="Switch" type="SwitchStepType" />
-      <xs:element name="IOOutput" type="OutputStepType" />
-      <xs:element name="CsvOutput" type="CsvOutputStepType" />
-      <xs:element name="SqlOutput" type="SqlOutputStepType" />
-      <xs:element name="HttpOutput" type="HttpOutputStepType" />
-      <xs:element name="JsonOutput" type="JsonOutputStepType" />
-      <xs:element name="XmlOutput" type="XmlOutputStepType" />
-      <xs:element name="MemoryOutput" type="MemoryOutputStepType" />
+      <xs:element name="IOInput" type="InputStepType">
+        <xs:annotation>
+          <xs:documentation>Generic or legacy input step specifying provider kind via the 'Kind' attribute.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="MemoryInput" type="MemoryInputStepType">
+        <xs:annotation>
+          <xs:documentation>Input step that reads rows passed in-memory (from parent integration, test runner, or mock data).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="CsvInput" type="CsvInputStepType">
+        <xs:annotation>
+          <xs:documentation>Input step that reads tabular data from a CSV file.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="SqlInput" type="SqlInputStepType">
+        <xs:annotation>
+          <xs:documentation>Input step that executes a SQL query or stored procedure against a relational database.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="HttpInput" type="HttpInputStepType">
+        <xs:annotation>
+          <xs:documentation>Input step that performs an HTTP request and parses response records using JSONPath.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="JsonInput" type="JsonInputStepType">
+        <xs:annotation>
+          <xs:documentation>Input step that reads a JSON file and extracts records using JSONPath.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="XmlInput" type="XmlInputStepType">
+        <xs:annotation>
+          <xs:documentation>Input step that reads an XML file and extracts repeating item elements as records.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="FileSystemInput" type="FileSystemInputStepType">
+        <xs:annotation>
+          <xs:documentation>Input step that enumerates files from a file system directory with optional metadata (size, dates).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ServiceBusInput" type="ServiceBusInputStepType">
+        <xs:annotation>
+          <xs:documentation>Input step that receives JSON-object messages from an Azure Service Bus topic subscription.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="RunIntegration" type="RunIntegrationStepType">
+        <xs:annotation>
+          <xs:documentation>Executes a child integration pipeline for each incoming record, passing data to its first MemoryInput.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Map" type="MapStepType">
+        <xs:annotation>
+          <xs:documentation>Transformation step that evaluates a Power Fx worksheet per record; each named formula cell becomes a record field.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Filter" type="FilterStepType">
+        <xs:annotation>
+          <xs:documentation>Filtering step that evaluates a Power Fx worksheet predicate to conditionally keep or drop records.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Reduce" type="ReduceStepType">
+        <xs:annotation>
+          <xs:documentation>Aggregation step that folds records across the stream into a state object using Power Fx, with optional grouping.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Switch" type="SwitchStepType">
+        <xs:annotation>
+          <xs:documentation>Conditional routing step that evaluates worksheet boolean cells and dispatches records to matching branches.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="IOOutput" type="OutputStepType">
+        <xs:annotation>
+          <xs:documentation>Generic or legacy output step specifying provider kind via the 'Kind' attribute.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="CsvOutput" type="CsvOutputStepType">
+        <xs:annotation>
+          <xs:documentation>Output step that writes records to a CSV file.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="SqlOutput" type="SqlOutputStepType">
+        <xs:annotation>
+          <xs:documentation>Output step that inserts records into a database table or executes a parameterized SQL command.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="HttpOutput" type="HttpOutputStepType">
+        <xs:annotation>
+          <xs:documentation>Output step that sends records to an HTTP endpoint formatted as JSON, XML, or CSV.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="JsonOutput" type="JsonOutputStepType">
+        <xs:annotation>
+          <xs:documentation>Output step that writes records to a JSON file.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="XmlOutput" type="XmlOutputStepType">
+        <xs:annotation>
+          <xs:documentation>Output step that writes records to an XML file with customizable root and record element names.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="MemoryOutput" type="MemoryOutputStepType">
+        <xs:annotation>
+          <xs:documentation>Output step that collects records in memory for programmatic retrieval or testing.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:choice>
   </xs:complexType>
 
-  <!-- Worksheet Types -->
+  <!-- ========================================================================= -->
+  <!-- Worksheet Types                                                           -->
+  <!-- ========================================================================= -->
+
   <xs:complexType name="VariableType">
+    <xs:annotation>
+      <xs:documentation>Key-value pair defining a worksheet input variable or parameter.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="Key" type="xs:string" minOccurs="0" />
-      <xs:element name="Value" type="xs:string" minOccurs="0" />
+      <xs:element name="Key" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Variable name/identifier when specified as a child element.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Value" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Variable value when specified as a child element.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
-    <xs:attribute name="Key" type="xs:string" use="optional" />
-    <xs:attribute name="Value" type="xs:string" use="optional" />
+    <xs:attribute name="Key" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Variable name/identifier when specified as an attribute.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Value" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Variable value when specified as an attribute.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="VariablesType">
+    <xs:annotation>
+      <xs:documentation>Collection of worksheet variable definitions.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="Variable" type="VariableType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="Variable" type="VariableType" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Individual variable definition.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="WorkCellType">
+    <xs:annotation>
+      <xs:documentation>A single calculation or formula cell within a worksheet, evaluated in sequence.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="Id" type="xs:int" minOccurs="0" />
-      <xs:element name="Name" type="xs:string" minOccurs="0" />
-      <xs:element name="Formula" type="xs:string" minOccurs="0" />
-      <xs:element name="Comments" type="xs:string" minOccurs="0" />
+      <xs:element name="Id" type="xs:int" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Numeric identifier or order number for the cell.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Name" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Cell name, usable as a variable in subsequent formulas and becoming a record field in Map steps.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Formula" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Power Fx formula expression (without leading '=') evaluated for this cell.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Comments" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Optional comments or notes explaining the cell's purpose or logic.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
-    <xs:attribute name="Id" type="xs:int" use="optional" />
-    <xs:attribute name="Name" type="xs:string" use="optional" />
-    <xs:attribute name="Formula" type="xs:string" use="optional" />
-    <xs:attribute name="Comments" type="xs:string" use="optional" />
+    <xs:attribute name="Id" type="xs:int" use="optional">
+      <xs:annotation>
+        <xs:documentation>Numeric identifier or order number for the cell when specified as an attribute.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Name" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Cell name when specified as an attribute.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Formula" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Power Fx formula expression when specified as an attribute.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Comments" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Comments or notes when specified as an attribute.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="CellsType">
+    <xs:annotation>
+      <xs:documentation>Ordered collection of work cells evaluated sequentially.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="WorkCell" type="WorkCellType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="WorkCell" type="WorkCellType" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Individual worksheet cell definition.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="TestScenariosType">
+    <xs:annotation>
+      <xs:documentation>Collection of automated test scenarios embedded in the worksheet.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="TestScenario" type="TestScenarioType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="TestScenario" type="TestScenarioType" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Individual test scenario with defined inputs and expected cell outputs.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="TestScenarioType">
+    <xs:annotation>
+      <xs:documentation>Test scenario defining specific input variable values and expected cell calculation outcomes.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="Inputs" type="VariablesType" minOccurs="0" />
-      <xs:element name="ExpectedCells" type="ExpectedCellsType" minOccurs="0" />
+      <xs:element name="Inputs" type="VariablesType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Input variable values supplied for this test scenario.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ExpectedCells" type="ExpectedCellsType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Expected cell values asserting the calculation results for this scenario.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
-    <xs:attribute name="Name" type="xs:string" use="optional" />
+    <xs:attribute name="Name" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Descriptive name of the test scenario.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="ExpectedCellsType">
+    <xs:annotation>
+      <xs:documentation>Collection of expected cell value assertions.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="Cell" type="ExpectedCellType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="Cell" type="ExpectedCellType" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Expected value assertion for a specific named cell.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="ExpectedCellType">
+    <xs:annotation>
+      <xs:documentation>Assertion pairing a cell name with its expected evaluated string value.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="Name" type="xs:string" minOccurs="0" />
-      <xs:element name="Value" type="xs:string" minOccurs="0" />
+      <xs:element name="Name" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Name of the cell being asserted.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Value" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Expected evaluated string value of the cell.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
 
-  <!-- Worksheet Reference or Inline in Steps -->
+  <!-- ========================================================================= -->
+  <!-- Worksheet Reference or Inline in Steps                                    -->
+  <!-- ========================================================================= -->
+
   <xs:complexType name="WorksheetStepType" mixed="true">
+    <xs:annotation>
+      <xs:documentation>Defines a Power Fx worksheet either inline or via a file path reference relative to the integration definition.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="Name" type="xs:string" minOccurs="0" />
-      <xs:element name="Variables" type="VariablesType" minOccurs="0" />
-      <xs:element name="Cells" type="CellsType" minOccurs="0" />
-      <xs:element name="TestScenarios" type="TestScenariosType" minOccurs="0" />
-      <xs:element name="FilePath" type="xs:string" minOccurs="0" />
-      <xs:element name="Path" type="xs:string" minOccurs="0" />
-      <xs:element name="Filename" type="xs:string" minOccurs="0" />
-      <xs:element name="FileName" type="xs:string" minOccurs="0" />
+      <xs:element name="Name" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Optional name of the worksheet.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Variables" type="VariablesType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Initial variables or constants available to worksheet formulas.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Cells" type="CellsType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Ordered calculation cells containing Power Fx formulas.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="TestScenarios" type="TestScenariosType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Embedded test scenarios for verifying worksheet calculations.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="FilePath" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Relative or absolute path to an external worksheet XML file.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Path" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Alias for FilePath.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Filename" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Alias for FilePath.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="FileName" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Alias for FilePath.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
-    <xs:attribute name="FilePath" type="xs:string" use="optional" />
-    <xs:attribute name="Path" type="xs:string" use="optional" />
-    <xs:attribute name="File" type="xs:string" use="optional" />
-    <xs:attribute name="Filename" type="xs:string" use="optional" />
-    <xs:attribute name="FileName" type="xs:string" use="optional" />
+    <xs:attribute name="FilePath" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Path to an external worksheet XML file (canonical attribute form).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Path" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Alias attribute for FilePath.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="File" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Alias attribute for FilePath.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Filename" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Alias attribute for FilePath.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="FileName" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Alias attribute for FilePath.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
-  <!-- Mock Data Models -->
+  <!-- ========================================================================= -->
+  <!-- Mock Data Models                                                          -->
+  <!-- ========================================================================= -->
+
   <xs:complexType name="MockDataType" mixed="true">
+    <xs:annotation>
+      <xs:documentation>Defines mock input or output data inline or via external file for safe, disconnected testing.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="Name" type="xs:string" minOccurs="0" />
-      <xs:element name="Key" type="xs:string" minOccurs="0" />
-      <xs:element name="Scenario" type="xs:string" minOccurs="0" />
-      <xs:element name="ScenarioName" type="xs:string" minOccurs="0" />
-      <xs:element name="FilePath" type="xs:string" minOccurs="0" />
-      <xs:element name="Path" type="xs:string" minOccurs="0" />
-      <xs:element name="Filename" type="xs:string" minOccurs="0" />
-      <xs:element name="FileName" type="xs:string" minOccurs="0" />
-      <xs:element name="Content" type="xs:string" minOccurs="0" />
+      <xs:element name="Name" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Identifier or scenario name of the mock data source.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Key" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Alias for Name/Scenario identifier.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Scenario" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Name of the test scenario matching the '--scenario' CLI flag.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ScenarioName" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Alias for Scenario name.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="FilePath" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Path to an external mock data file (CSV, JSON, XML).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Path" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Alias for FilePath.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Filename" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Alias for FilePath.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="FileName" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Alias for FilePath.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Content" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Inline mock data payload (e.g., CSV text or JSON string).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
-    <xs:attribute name="Name" type="xs:string" use="optional" />
-    <xs:attribute name="Key" type="xs:string" use="optional" />
-    <xs:attribute name="Scenario" type="xs:string" use="optional" />
-    <xs:attribute name="ScenarioName" type="xs:string" use="optional" />
-    <xs:attribute name="Id" type="xs:string" use="optional" />
-    <xs:attribute name="FilePath" type="xs:string" use="optional" />
-    <xs:attribute name="Path" type="xs:string" use="optional" />
-    <xs:attribute name="File" type="xs:string" use="optional" />
-    <xs:attribute name="Filename" type="xs:string" use="optional" />
-    <xs:attribute name="FileName" type="xs:string" use="optional" />
-    <xs:attribute name="MockCsvFilePath" type="xs:string" use="optional" />
-    <xs:attribute name="MockFilePath" type="xs:string" use="optional" />
-    <xs:attribute name="MockDataFilePath" type="xs:string" use="optional" />
-    <xs:attribute name="MockPath" type="xs:string" use="optional" />
-    <xs:attribute name="MockCsv" type="xs:string" use="optional" />
-    <xs:attribute name="Content" type="xs:string" use="optional" />
-    <xs:attribute name="RawText" type="xs:string" use="optional" />
-    <xs:attribute name="Text" type="xs:string" use="optional" />
-    <xs:attribute name="Value" type="xs:string" use="optional" />
+    <xs:attribute name="Name" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifier or scenario name for the mock data source.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Key" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Alias for Name attribute.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Scenario" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Name of the test scenario matching the '--scenario' CLI flag.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ScenarioName" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Alias for Scenario attribute.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Id" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifier for the mock data entry.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="FilePath" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Path to an external mock data file.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Path" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Alias attribute for FilePath.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="File" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Alias attribute for FilePath.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Filename" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Alias attribute for FilePath.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="FileName" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Alias attribute for FilePath.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="MockCsvFilePath" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Path to an external mock CSV file.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="MockFilePath" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Path to an external mock data file.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="MockDataFilePath" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Path to an external mock data file.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="MockPath" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Path to an external mock data file.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="MockCsv" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Inline mock CSV text content.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Content" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Inline raw text mock payload content.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="RawText" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Inline raw text mock payload content.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Text" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Inline raw text mock payload content.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Value" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Inline mock data value string.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="MockDataSourcesType">
+    <xs:annotation>
+      <xs:documentation>Container for one or more mock data sources or scenarios.</xs:documentation>
+    </xs:annotation>
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="MockData" type="MockDataType" />
-      <xs:element name="MockCsv" type="MockDataType" />
-      <xs:element name="Mock" type="MockDataType" />
-      <xs:element name="MockDataSource" type="MockDataType" />
-      <xs:element name="MockDataEntry" type="MockDataType" />
-      <xs:element name="MockItem" type="MockDataType" />
+      <xs:element name="MockData" type="MockDataType">
+        <xs:annotation>
+          <xs:documentation>Mock data definition (canonical element name).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="MockCsv" type="MockDataType">
+        <xs:annotation>
+          <xs:documentation>Mock CSV data definition.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Mock" type="MockDataType">
+        <xs:annotation>
+          <xs:documentation>Alias element for mock data definition.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="MockDataSource" type="MockDataType">
+        <xs:annotation>
+          <xs:documentation>Alias element for mock data definition.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="MockDataEntry" type="MockDataType">
+        <xs:annotation>
+          <xs:documentation>Alias element for mock data definition.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="MockItem" type="MockDataType">
+        <xs:annotation>
+          <xs:documentation>Alias element for mock data definition.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:choice>
   </xs:complexType>
 
-  <!-- Input Step -->
+  <!-- ========================================================================= -->
+  <!-- Input Step Types                                                          -->
+  <!-- ========================================================================= -->
+
   <xs:simpleType name="InputKindType">
+    <xs:annotation>
+      <xs:documentation>Enumeration of legacy input provider kinds used with the 'IOInput' element.</xs:documentation>
+    </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:enumeration value="CSVReader" />
-      <xs:enumeration value="SqlReader" />
-      <xs:enumeration value="HttpReader" />
-      <xs:enumeration value="JsonReader" />
-      <xs:enumeration value="XmlReader" />
-      <xs:enumeration value="FileSystemReader" />
+      <xs:enumeration value="CSVReader">
+        <xs:annotation>
+          <xs:documentation>Reads tabular records from a CSV file (legacy alias for CsvInput).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SqlReader">
+        <xs:annotation>
+          <xs:documentation>Reads records by querying a database (legacy alias for SqlInput).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="HttpReader">
+        <xs:annotation>
+          <xs:documentation>Reads records by calling an HTTP endpoint (legacy alias for HttpInput).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="JsonReader">
+        <xs:annotation>
+          <xs:documentation>Reads records from a JSON file (legacy alias for JsonInput).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="XmlReader">
+        <xs:annotation>
+          <xs:documentation>Reads records from an XML file (legacy alias for XmlInput).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="FileSystemReader">
+        <xs:annotation>
+          <xs:documentation>Enumerates files in a directory (legacy alias for FileSystemInput).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
     </xs:restriction>
   </xs:simpleType>
 
   <xs:complexType name="InputProviderCommonType">
+    <xs:annotation>
+      <xs:documentation>Common base configuration for all input provider steps, including mock data bindings and step identifier.</xs:documentation>
+    </xs:annotation>
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="MockCsv" type="MockDataType" />
-      <xs:element name="MockData" type="MockDataType" />
-      <xs:element name="MockDataSources" type="MockDataSourcesType" />
-      <xs:element name="Mocks" type="MockDataSourcesType" />
+      <xs:element name="MockCsv" type="MockDataType">
+        <xs:annotation>
+          <xs:documentation>Inline mock CSV data or external mock CSV file reference for this input step.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="MockData" type="MockDataType">
+        <xs:annotation>
+          <xs:documentation>Inline mock data payload or file reference for this input step.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="MockDataSources" type="MockDataSourcesType">
+        <xs:annotation>
+          <xs:documentation>Collection of named mock data sources and scenarios for this input step.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Mocks" type="MockDataSourcesType">
+        <xs:annotation>
+          <xs:documentation>Alias for MockDataSources container.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:choice>
-    <xs:attribute name="Id" type="xs:string" use="optional" />
-    <xs:attribute name="MockCsvFilePath" type="xs:string" use="optional" />
+    <xs:attribute name="Id" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Unique identifier for this input step within the pipeline.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="MockCsvFilePath" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Direct attribute reference to an external mock CSV file.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
-  
 
   <xs:complexType name="MemoryInputStepType">
+    <xs:annotation>
+      <xs:documentation>Reads rows supplied in-memory, such as rows passed from a parent RunIntegration step or programmatic execution.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
-      <xs:extension base="InputProviderCommonType">
-      </xs:extension>
+      <xs:extension base="InputProviderCommonType" />
     </xs:complexContent>
   </xs:complexType>
   
   <xs:complexType name="CsvInputStepType">
+    <xs:annotation>
+      <xs:documentation>Reads tabular records from a CSV file. The first row is treated as column headers.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="InputProviderCommonType">
-        <xs:attribute name="FilePath" type="xs:string" use="optional" />
-        <xs:attribute name="FilePathFromField" type="xs:string" use="optional" />
+        <xs:attribute name="FilePath" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Path to the CSV file to read (relative to integration file or absolute; supports '{{ input.FieldName }}' template interpolation).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="FilePathFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the incoming record field containing the CSV file path.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="SqlInputStepType">
+    <xs:annotation>
+      <xs:documentation>Reads database records by executing a SQL query, table select, or stored procedure.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="InputProviderCommonType">
         <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:element name="Query" type="xs:string" />
-          <xs:element name="QueryFromField" type="xs:string" />
-          <xs:element name="SqlParam" type="SqlParamType" />
+          <xs:element name="Query" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>SQL query or stored procedure command text (element form, supports field and secret interpolation).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="QueryFromField" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>Name of the record field containing the SQL query text.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="SqlParam" type="SqlParamType">
+            <xs:annotation>
+              <xs:documentation>Parameterized SQL command parameter mapping.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
         </xs:choice>
-        <xs:attribute name="ConnectionString" type="xs:string" use="optional" />
-        <xs:attribute name="ConnectionStringFromField" type="xs:string" use="optional" />
-        <xs:attribute name="TableName" type="xs:string" use="optional" />
-        <xs:attribute name="TableNameFromField" type="xs:string" use="optional" />
-        <xs:attribute name="Query" type="xs:string" use="optional" />
-        <xs:attribute name="QueryFromField" type="xs:string" use="optional" />
-        <xs:attribute name="CommandType" type="SqlCommandTypeType" use="optional" default="Text" />
+        <xs:attribute name="ConnectionString" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Database connection string (supports '{{ secrets.SecretName }}' placeholders).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="ConnectionStringFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the incoming record field containing the connection string.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="TableName" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Database table name from which to select all records ('SELECT * FROM [TableName]').</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="TableNameFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the incoming record field containing the table name.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="Query" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>SQL query or stored procedure command text (attribute form).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="QueryFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the incoming record field containing the SQL query text.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="CommandType" type="SqlCommandTypeType" use="optional" default="Text">
+          <xs:annotation>
+            <xs:documentation>Specifies whether the Query is standard SQL text ('Text') or a stored procedure name ('StoredProcedure'). Default is Text.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="HttpInputStepType">
+    <xs:annotation>
+      <xs:documentation>Performs an HTTP request to an endpoint and extracts data records using a JSONPath expression.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="InputProviderCommonType">
-        <xs:attribute name="HttpConfiguration" type="xs:string" use="optional" />
-        <xs:attribute name="Endpoint" type="xs:string" use="optional" />
-        <xs:attribute name="EndpointFromField" type="xs:string" use="optional" />
-        <xs:attribute name="HttpMethod" type="xs:string" use="optional" default="GET" />
-        <xs:attribute name="JsonPath" type="xs:string" use="optional" default="$" />
-        <xs:attribute name="JsonPathFromField" type="xs:string" use="optional" />
+        <xs:attribute name="HttpConfiguration" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the HttpConfiguration defining the base URL, authentication, and default headers.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="Endpoint" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Relative URL path for the HTTP request (supports '{{ input.FieldName }}' template interpolation).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="EndpointFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the relative endpoint URL.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="HttpMethod" type="xs:string" use="optional" default="GET">
+          <xs:annotation>
+            <xs:documentation>HTTP method verb (e.g., 'GET', 'POST'). Default is 'GET'.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="JsonPath" type="xs:string" use="optional" default="$">
+          <xs:annotation>
+            <xs:documentation>JSONPath expression selecting record objects or array from the HTTP JSON response body (default is '$').</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="JsonPathFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the JSONPath expression.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="ServiceBusInputStepType">
+    <xs:annotation>
+      <xs:documentation>Receives JSON-object messages from an Azure Service Bus topic subscription, completing each message after downstream success.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="InputProviderCommonType">
-        <xs:attribute name="ConnectionString" type="xs:string" use="optional" />
-        <xs:attribute name="ConnectionStringFromField" type="xs:string" use="optional" />
-        <xs:attribute name="TopicName" type="xs:string" use="optional" />
-        <xs:attribute name="TopicNameFromField" type="xs:string" use="optional" />
-        <xs:attribute name="SubscriptionName" type="xs:string" use="optional" />
-        <xs:attribute name="SubscriptionNameFromField" type="xs:string" use="optional" />
+        <xs:attribute name="ConnectionString" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Azure Service Bus connection string (supports '{{ secrets.SecretName }}' placeholders).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="ConnectionStringFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the Service Bus connection string.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="TopicName" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the Service Bus topic.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="TopicNameFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the topic name.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="SubscriptionName" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the subscription under the topic.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="SubscriptionNameFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the subscription name.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="JsonInputStepType">
+    <xs:annotation>
+      <xs:documentation>Reads data from a JSON file and extracts record objects using a JSONPath expression.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="InputProviderCommonType">
-        <xs:attribute name="FilePath" type="xs:string" use="optional" />
-        <xs:attribute name="FilePathFromField" type="xs:string" use="optional" />
-        <xs:attribute name="JsonPath" type="xs:string" use="optional" default="$" />
-        <xs:attribute name="JsonPathFromField" type="xs:string" use="optional" />
+        <xs:attribute name="FilePath" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Path to the JSON file to read (supports '{{ input.FieldName }}' template interpolation).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="FilePathFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the JSON file path.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="JsonPath" type="xs:string" use="optional" default="$">
+          <xs:annotation>
+            <xs:documentation>JSONPath expression selecting record objects from the JSON file (default is '$').</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="JsonPathFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the JSONPath expression.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="XmlInputStepType">
+    <xs:annotation>
+      <xs:documentation>Reads an XML file and extracts repeating item elements as individual data records.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="InputProviderCommonType">
-        <xs:attribute name="FilePath" type="xs:string" use="optional" />
-        <xs:attribute name="FilePathFromField" type="xs:string" use="optional" />
-        <xs:attribute name="XmlItemElement" type="xs:string" use="optional" />
-        <xs:attribute name="XmlItemElementFromField" type="xs:string" use="optional" />
+        <xs:attribute name="FilePath" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Path to the XML file to read (supports '{{ input.FieldName }}' template interpolation).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="FilePathFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the XML file path.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="XmlItemElement" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Tag name of repeating XML elements to parse as individual records.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="XmlItemElementFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the XML item element tag name.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="FileSystemInputStepType">
+    <xs:annotation>
+      <xs:documentation>Enumerates files in a directory or file pattern and yields records with file path and optional metadata fields.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="InputProviderCommonType">
-        <xs:attribute name="FilePath" type="xs:string" use="optional" />
-        <xs:attribute name="FilePathFromField" type="xs:string" use="optional" />
-        <xs:attribute name="AddFileSizeField" type="xs:boolean" use="optional" />
-        <xs:attribute name="AddCreatedOnDate" type="xs:boolean" use="optional" />
-        <xs:attribute name="AddLastModifiedDateField" type="xs:boolean" use="optional" />
+        <xs:attribute name="FilePath" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Directory path or file glob pattern to enumerate (supports '{{ input.FieldName }}' template interpolation).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="FilePathFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the directory path or file pattern.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="AddFileSizeField" type="xs:boolean" use="optional">
+          <xs:annotation>
+            <xs:documentation>When true, adds a 'FileSize' field containing the file size in bytes to each yielded record.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="AddCreatedOnDate" type="xs:boolean" use="optional">
+          <xs:annotation>
+            <xs:documentation>When true, adds a 'CreatedOn' field containing the file creation timestamp to each yielded record.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="AddLastModifiedDateField" type="xs:boolean" use="optional">
+          <xs:annotation>
+            <xs:documentation>When true, adds a 'LastModified' field containing the last write timestamp to each yielded record.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
-  <!-- Map Step -->
+  <xs:complexType name="InputStepType">
+    <xs:annotation>
+      <xs:documentation>Legacy unified input step structure supporting all input reader kinds via the 'Kind' attribute.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="InputProviderCommonType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="Query" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>SQL query or stored procedure command text.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="QueryFromField" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>Field name to dynamically bind SQL query text.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="SqlParam" type="SqlParamType">
+            <xs:annotation>
+              <xs:documentation>SQL command parameter binding.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:choice>
+        <xs:attribute name="Kind" type="InputKindType" use="optional">
+          <xs:annotation>
+            <xs:documentation>Specifies the input reader provider kind (e.g., CSVReader, SqlReader, HttpReader, JsonReader, XmlReader, FileSystemReader).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="FilePath" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>File path or directory path for file-based input readers.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="FilePathFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Field name to dynamically bind the file path.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="ConnectionString" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Connection string for database or service bus readers.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="ConnectionStringFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Field name to dynamically bind the connection string.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="TableName" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Database table name for SQL input.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="TableNameFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Field name to dynamically bind the table name.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="Query" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>SQL query or stored procedure command text.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="QueryFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Field name to dynamically bind the SQL query text.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="CommandType" type="SqlCommandTypeType" use="optional" default="Text">
+          <xs:annotation>
+            <xs:documentation>SQL command type ('Text' or 'StoredProcedure'). Default is Text.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="HttpConfiguration" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Referenced HttpConfiguration name for HTTP input.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="Endpoint" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Relative endpoint URL for HTTP input.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="EndpointFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Field name to dynamically bind the HTTP endpoint URL.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="HttpMethod" type="xs:string" use="optional" default="GET">
+          <xs:annotation>
+            <xs:documentation>HTTP method verb (default 'GET').</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="JsonPath" type="xs:string" use="optional" default="$">
+          <xs:annotation>
+            <xs:documentation>JSONPath expression for JSON or HTTP input (default '$').</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="JsonPathFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Field name to dynamically bind the JSONPath expression.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="TopicName" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Service Bus topic name.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="TopicNameFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Field name to dynamically bind the Service Bus topic name.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="SubscriptionName" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Service Bus subscription name.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="SubscriptionNameFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Field name to dynamically bind the Service Bus subscription name.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="XmlItemElement" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Repeating element tag name for XML input.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="XmlItemElementFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Field name to dynamically bind the XML item element tag name.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="AddFileSizeField" type="xs:boolean" use="optional">
+          <xs:annotation>
+            <xs:documentation>Whether to include the FileSize field in FileSystem input.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="AddCreatedOnDate" type="xs:boolean" use="optional">
+          <xs:annotation>
+            <xs:documentation>Whether to include the CreatedOn field in FileSystem input.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="AddLastModifiedDateField" type="xs:boolean" use="optional">
+          <xs:annotation>
+            <xs:documentation>Whether to include the LastModified field in FileSystem input.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- ========================================================================= -->
+  <!-- Transformation, Routing, and Invocation Steps                             -->
+  <!-- ========================================================================= -->
+
   <xs:complexType name="RunIntegrationStepType">
-    <xs:attribute name="Id" type="xs:string" use="optional" />
-    <xs:attribute name="FilePath" type="xs:string" use="required" />
-    <xs:attribute name="FromField" type="xs:string" use="optional" />
+    <xs:annotation>
+      <xs:documentation>Runs a child integration for each incoming record, supplying data to the child's first MemoryInput step.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="Id" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Unique step identifier within the pipeline.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="FilePath" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Path to the child integration XML definition file (resolved relative to parent integration).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="FromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Optional field name on the current record to pass to the child integration (if omitted, passes the entire record).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="MapStepType">
+    <xs:annotation>
+      <xs:documentation>Transforms the current record by evaluating a Power Fx worksheet. Every named non-empty formula cell becomes a field in the output record.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="Worksheet" type="WorksheetStepType" minOccurs="0" />
+      <xs:element name="Worksheet" type="WorksheetStepType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Inline worksheet or reference to an external worksheet XML file defining transformation formulas.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
-    <xs:attribute name="Id" type="xs:string" use="optional" />
-    <xs:attribute name="OutputField" type="xs:string" use="optional" />
+    <xs:attribute name="Id" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Unique step identifier within the pipeline.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="OutputField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Legacy compatibility attribute (in modern execution, all named formula cells are added to the record).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
-  <!-- Filter Step -->
   <xs:complexType name="FilterStepType">
+    <xs:annotation>
+      <xs:documentation>Evaluates a Power Fx worksheet expression. The boolean outcome of the final non-empty cell decides whether to keep or discard the record.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="Worksheet" type="WorksheetStepType" minOccurs="0" />
+      <xs:element name="Worksheet" type="WorksheetStepType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Inline worksheet or reference to an external worksheet XML file defining filter conditions.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
-    <xs:attribute name="Id" type="xs:string" use="optional" />
-    <xs:attribute name="KeepWhenTrue" type="xs:boolean" use="optional" default="true" />
+    <xs:attribute name="Id" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Unique step identifier within the pipeline.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="KeepWhenTrue" type="xs:boolean" use="optional" default="true">
+      <xs:annotation>
+        <xs:documentation>When true (default), records evaluating to true are retained. When false, records evaluating to true are discarded.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
-  <!-- Reduce Step -->
   <xs:complexType name="ReduceStepType">
+    <xs:annotation>
+      <xs:documentation>Aggregates/folds records across the stream into an accumulator state using Power Fx. Supports optional grouping by a record field.</xs:documentation>
+    </xs:annotation>
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="InitialStateJson" type="xs:string" />
-      <xs:element name="Worksheet" type="WorksheetStepType" />
+      <xs:element name="InitialStateJson" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Initial accumulator state serialized as JSON (e.g., '0', '{}', or '{"Count": 0, "Sum": 0}').</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Worksheet" type="WorksheetStepType">
+        <xs:annotation>
+          <xs:documentation>Worksheet evaluating 'State' and 'InputRecord'; the final non-empty cell produces the updated accumulator state.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="GroupByField" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Field name by which to group reduction; maintains a separate state per group and outputs one record per distinct group value.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="GroupBy" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Alias for GroupByField.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:choice>
-    <xs:attribute name="Id" type="xs:string" use="optional" />
-    <xs:attribute name="OutputField" type="xs:string" use="optional" default="State" />
+    <xs:attribute name="Id" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Unique step identifier within the pipeline.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="OutputField" type="xs:string" use="optional" default="State">
+      <xs:annotation>
+        <xs:documentation>Name of the record field in the resulting record that stores the final accumulated state (default is 'State').</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="GroupByField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Field name by which to group records during reduction (attribute form).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="GroupBy" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Alias attribute for GroupByField.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
-  <!-- Switch Step -->
   <xs:complexType name="SwitchBranchType">
+    <xs:annotation>
+      <xs:documentation>A conditional branch within a Switch step, executed when its associated worksheet WorkCell evaluates to true.</xs:documentation>
+    </xs:annotation>
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="Map" type="MapStepType" />
-      <xs:element name="Filter" type="FilterStepType" />
-      <xs:element name="Reduce" type="ReduceStepType" />
-      <xs:element name="Switch" type="SwitchStepType" />
-      <xs:element name="CsvOutput" type="CsvOutputStepType" />
-      <xs:element name="SqlOutput" type="SqlOutputStepType" />
-      <xs:element name="HttpOutput" type="HttpOutputStepType" />
-      <xs:element name="JsonOutput" type="JsonOutputStepType" />
-      <xs:element name="XmlOutput" type="XmlOutputStepType" />
-      <xs:element name="MemoryOutput" type="MemoryOutputStepType" />
+      <xs:element name="Map" type="MapStepType">
+        <xs:annotation>
+          <xs:documentation>Nested Map step executed within this branch.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Filter" type="FilterStepType">
+        <xs:annotation>
+          <xs:documentation>Nested Filter step executed within this branch.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Reduce" type="ReduceStepType">
+        <xs:annotation>
+          <xs:documentation>Nested Reduce step executed within this branch.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Switch" type="SwitchStepType">
+        <xs:annotation>
+          <xs:documentation>Nested Switch step executed within this branch.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="CsvOutput" type="CsvOutputStepType">
+        <xs:annotation>
+          <xs:documentation>Nested CsvOutput step executed within this branch.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="SqlOutput" type="SqlOutputStepType">
+        <xs:annotation>
+          <xs:documentation>Nested SqlOutput step executed within this branch.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="HttpOutput" type="HttpOutputStepType">
+        <xs:annotation>
+          <xs:documentation>Nested HttpOutput step executed within this branch.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="JsonOutput" type="JsonOutputStepType">
+        <xs:annotation>
+          <xs:documentation>Nested JsonOutput step executed within this branch.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="XmlOutput" type="XmlOutputStepType">
+        <xs:annotation>
+          <xs:documentation>Nested XmlOutput step executed within this branch.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="MemoryOutput" type="MemoryOutputStepType">
+        <xs:annotation>
+          <xs:documentation>Nested MemoryOutput step executed within this branch.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:choice>
-    <xs:attribute name="WorkCell" type="xs:string" use="optional" />
+    <xs:attribute name="WorkCell" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Name of the boolean worksheet cell that gates execution of this branch when true.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="SwitchStepType">
+    <xs:annotation>
+      <xs:documentation>Evaluates a worksheet once per incoming record and routes the record to all Branch blocks whose WorkCell evaluates to true.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="Worksheet" type="WorksheetStepType" minOccurs="0" />
-      <xs:element name="Branch" type="SwitchBranchType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="Worksheet" type="WorksheetStepType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Worksheet computing boolean conditions for branch dispatching.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Branch" type="SwitchBranchType" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Execution branch conditioned on a named worksheet cell.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
-    <xs:attribute name="Id" type="xs:string" use="optional" />
+    <xs:attribute name="Id" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Unique step identifier within the pipeline.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
-  <!-- Output Step -->
+  <!-- ========================================================================= -->
+  <!-- Output Step Types                                                         -->
+  <!-- ========================================================================= -->
+
   <xs:simpleType name="OutputKindType">
+    <xs:annotation>
+      <xs:documentation>Enumeration of legacy output provider kinds used with the 'IOOutput' element.</xs:documentation>
+    </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:enumeration value="CSVWriter" />
-      <xs:enumeration value="SqlWriter" />
-      <xs:enumeration value="HttpWriter" />
-      <xs:enumeration value="JsonWriter" />
-      <xs:enumeration value="XmlWriter" />
-      <xs:enumeration value="MemoryWriter" />
+      <xs:enumeration value="CSVWriter">
+        <xs:annotation>
+          <xs:documentation>Writes records to a CSV file (legacy alias for CsvOutput).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SqlWriter">
+        <xs:annotation>
+          <xs:documentation>Writes records to a database (legacy alias for SqlOutput).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="HttpWriter">
+        <xs:annotation>
+          <xs:documentation>Sends records to an HTTP endpoint (legacy alias for HttpOutput).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="JsonWriter">
+        <xs:annotation>
+          <xs:documentation>Writes records to a JSON file (legacy alias for JsonOutput).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="XmlWriter">
+        <xs:annotation>
+          <xs:documentation>Writes records to an XML file (legacy alias for XmlOutput).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MemoryWriter">
+        <xs:annotation>
+          <xs:documentation>Captures records in memory (legacy alias for MemoryOutput).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="SqlCommandTypeType">
+    <xs:annotation>
+      <xs:documentation>Specifies the command type for SQL operations.</xs:documentation>
+    </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:enumeration value="Text" />
-      <xs:enumeration value="StoredProcedure" />
+      <xs:enumeration value="Text">
+        <xs:annotation>
+          <xs:documentation>Standard SQL query or statement text.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="StoredProcedure">
+        <xs:annotation>
+          <xs:documentation>Name of a database stored procedure.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
     </xs:restriction>
   </xs:simpleType>
 
   <xs:complexType name="SqlParamType">
-    <xs:attribute name="Name" type="xs:string" use="required" />
-    <xs:attribute name="FromField" type="xs:string" use="optional" />
-    <xs:attribute name="FromValue" type="xs:string" use="optional" />
+    <xs:annotation>
+      <xs:documentation>Maps a SQL parameter to a record field value or static literal value.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="Name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Name of the SQL parameter (e.g., '@CustomerId' or 'CustomerId').</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="FromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Name of the record field from which to obtain the parameter value.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="FromValue" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Static literal value for the parameter.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:simpleType name="HttpPayloadFormatType">
+    <xs:annotation>
+      <xs:documentation>Payload serialization format when sending data via HTTP output.</xs:documentation>
+    </xs:annotation>
     <xs:restriction base="xs:string">
-      <xs:enumeration value="Json" />
-      <xs:enumeration value="Xml" />
-      <xs:enumeration value="Csv" />
+      <xs:enumeration value="Json">
+        <xs:annotation>
+          <xs:documentation>Sends payload formatted as JSON.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Xml">
+        <xs:annotation>
+          <xs:documentation>Sends payload formatted as XML.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Csv">
+        <xs:annotation>
+          <xs:documentation>Sends payload formatted as CSV.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
     </xs:restriction>
   </xs:simpleType>
 
   <xs:complexType name="OutputStepType">
+    <xs:annotation>
+      <xs:documentation>Legacy unified output step structure supporting all output writer kinds via the 'Kind' attribute.</xs:documentation>
+    </xs:annotation>
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="Worksheet" type="WorksheetStepType" />
-      <xs:element name="TableName" type="xs:string" />
-      <xs:element name="TableNameFromField" type="xs:string" />
-      <xs:element name="Query" type="xs:string" />
-      <xs:element name="QueryFromField" type="xs:string" />
-      <xs:element name="SqlParam" type="SqlParamType" />
+      <xs:element name="Worksheet" type="WorksheetStepType">
+        <xs:annotation>
+          <xs:documentation>Optional worksheet for formatting output records.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="TableName" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Target database table name for SQL output.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="TableNameFromField" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Field name to dynamically bind the database table name.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Query" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>SQL query or stored procedure command text for SQL output.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="QueryFromField" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Field name to dynamically bind the SQL query text.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="SqlParam" type="SqlParamType">
+        <xs:annotation>
+          <xs:documentation>Parameter binding for SQL output commands.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:choice>
-    <xs:attribute name="Id" type="xs:string" use="optional" />
-    <xs:attribute name="Kind" type="OutputKindType" use="optional" />
-    <xs:attribute name="FilePath" type="xs:string" use="optional" />
-    <xs:attribute name="FilePathFromField" type="xs:string" use="optional" />
-    <xs:attribute name="ConnectionString" type="xs:string" use="optional" />
-    <xs:attribute name="ConnectionStringFromField" type="xs:string" use="optional" />
-    <xs:attribute name="TableName" type="xs:string" use="optional" />
-    <xs:attribute name="TableNameFromField" type="xs:string" use="optional" />
-    <xs:attribute name="Query" type="xs:string" use="optional" />
-    <xs:attribute name="QueryFromField" type="xs:string" use="optional" />
-    <xs:attribute name="CommandType" type="SqlCommandTypeType" use="optional" default="Text" />
-    <xs:attribute name="HttpConfiguration" type="xs:string" use="optional" />
-    <xs:attribute name="Endpoint" type="xs:string" use="optional" />
-    <xs:attribute name="EndpointFromField" type="xs:string" use="optional" />
-    <xs:attribute name="HttpMethod" type="xs:string" use="optional" default="POST" />
-    <xs:attribute name="PayloadFormat" type="HttpPayloadFormatType" use="optional" default="Json" />
-    <xs:attribute name="JsonPath" type="xs:string" use="optional" />
-    <xs:attribute name="JsonPathFromField" type="xs:string" use="optional" />
-    <xs:attribute name="XmlItemElement" type="xs:string" use="optional" />
-    <xs:attribute name="XmlItemElementFromField" type="xs:string" use="optional" />
-    <xs:attribute name="XmlRootElement" type="xs:string" use="optional" />
-    <xs:attribute name="XmlRootElementFromField" type="xs:string" use="optional" />
-    <xs:attribute name="XmlRecordElement" type="xs:string" use="optional" />
-    <xs:attribute name="XmlRecordElementFromField" type="xs:string" use="optional" />
+    <xs:attribute name="Id" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Unique step identifier within the pipeline; appends Status, StatusMessage, and AffectedRows fields to downstream records.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Kind" type="OutputKindType" use="optional">
+      <xs:annotation>
+        <xs:documentation>Specifies the output writer provider kind (e.g., CSVWriter, SqlWriter, HttpWriter, JsonWriter, XmlWriter, MemoryWriter).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="FilePath" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Path to destination output file (supports '{{ input.FieldName }}' template interpolation).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="FilePathFromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Field name to dynamically bind the destination file path.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ConnectionString" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Database connection string for SQL output.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ConnectionStringFromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Field name to dynamically bind the connection string.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="TableName" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Target database table name for SQL insert operations.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="TableNameFromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Field name to dynamically bind the table name.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Query" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>SQL insert/update statement or stored procedure text.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="QueryFromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Field name to dynamically bind the SQL query text.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="CommandType" type="SqlCommandTypeType" use="optional" default="Text">
+      <xs:annotation>
+        <xs:documentation>SQL command type ('Text' or 'StoredProcedure'). Default is Text.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="HttpConfiguration" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Referenced HttpConfiguration name for HTTP output.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="Endpoint" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Relative endpoint URL path for HTTP output.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="EndpointFromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Field name to dynamically bind the HTTP endpoint URL.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="HttpMethod" type="xs:string" use="optional" default="POST">
+      <xs:annotation>
+        <xs:documentation>HTTP method verb (e.g., 'POST', 'PUT', 'PATCH'). Default is 'POST'.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="PayloadFormat" type="HttpPayloadFormatType" use="optional" default="Json">
+      <xs:annotation>
+        <xs:documentation>Serialization format of the HTTP request body ('Json', 'Xml', or 'Csv'). Default is 'Json'.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="JsonPath" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Optional JSONPath expression for structuring output JSON payloads.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="JsonPathFromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Field name to dynamically bind the JSONPath expression.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="XmlItemElement" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>XML element tag name for record items in XML output.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="XmlItemElementFromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Field name to dynamically bind the XML item element name.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="XmlRootElement" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Root XML element tag name for XML output documents (e.g., 'Orders').</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="XmlRootElementFromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Field name to dynamically bind the XML root element name.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="XmlRecordElement" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Element tag name for each record in XML output documents (e.g., 'Order').</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="XmlRecordElementFromField" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Field name to dynamically bind the XML record element name.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="OutputProviderCommonType">
-    <xs:attribute name="Id" type="xs:string" use="optional" />
+    <xs:annotation>
+      <xs:documentation>Common base configuration for all output provider steps, providing the step identifier.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="Id" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Unique identifier for this output step; appends '&lt;Id&gt;.Status', '&lt;Id&gt;.StatusMessage', and '&lt;Id&gt;.AffectedRows' to downstream records.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="CsvOutputStepType">
+    <xs:annotation>
+      <xs:documentation>Writes output records to a CSV file on disk.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="OutputProviderCommonType">
-        <xs:attribute name="FilePath" type="xs:string" use="optional" />
-        <xs:attribute name="FilePathFromField" type="xs:string" use="optional" />
+        <xs:attribute name="FilePath" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Destination path for the CSV output file (supports '{{ input.FieldName }}' template interpolation).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="FilePathFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the destination CSV file path.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="SqlOutputStepType">
+    <xs:annotation>
+      <xs:documentation>Writes output records to a relational database table or executes a parameterized command.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="OutputProviderCommonType">
         <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:element name="TableName" type="xs:string" />
-          <xs:element name="TableNameFromField" type="xs:string" />
-          <xs:element name="Query" type="xs:string" />
-          <xs:element name="QueryFromField" type="xs:string" />
-          <xs:element name="SqlParam" type="SqlParamType" />
+          <xs:element name="TableName" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>Target database table name for insert operations (element form).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="TableNameFromField" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>Field name to dynamically bind the database table name.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Query" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>SQL insert/update statement or stored procedure name (element form).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="QueryFromField" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>Field name to dynamically bind the SQL query text.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="SqlParam" type="SqlParamType">
+            <xs:annotation>
+              <xs:documentation>Parameter binding for the SQL command.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
         </xs:choice>
-        <xs:attribute name="ConnectionString" type="xs:string" use="optional" />
-        <xs:attribute name="ConnectionStringFromField" type="xs:string" use="optional" />
-        <xs:attribute name="TableName" type="xs:string" use="optional" />
-        <xs:attribute name="TableNameFromField" type="xs:string" use="optional" />
-        <xs:attribute name="Query" type="xs:string" use="optional" />
-        <xs:attribute name="QueryFromField" type="xs:string" use="optional" />
-        <xs:attribute name="CommandType" type="SqlCommandTypeType" use="optional" default="Text" />
+        <xs:attribute name="ConnectionString" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Database connection string (supports '{{ secrets.SecretName }}' placeholders).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="ConnectionStringFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the connection string.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="TableName" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Target database table name for insert operations (attribute form).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="TableNameFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the table name.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="Query" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>SQL insert/update statement or stored procedure name (attribute form).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="QueryFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the SQL query text.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="CommandType" type="SqlCommandTypeType" use="optional" default="Text">
+          <xs:annotation>
+            <xs:documentation>Specifies whether the Query is standard SQL text ('Text') or a stored procedure name ('StoredProcedure'). Default is Text.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="HttpOutputStepType">
+    <xs:annotation>
+      <xs:documentation>Sends output records to an HTTP endpoint formatted as JSON, XML, or CSV payloads.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="OutputProviderCommonType">
-        <xs:attribute name="HttpConfiguration" type="xs:string" use="optional" />
-        <xs:attribute name="Endpoint" type="xs:string" use="optional" />
-        <xs:attribute name="EndpointFromField" type="xs:string" use="optional" />
-        <xs:attribute name="HttpMethod" type="xs:string" use="optional" default="POST" />
-        <xs:attribute name="PayloadFormat" type="HttpPayloadFormatType" use="optional" default="Json" />
+        <xs:attribute name="HttpConfiguration" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the HttpConfiguration defining the base URL, authentication, and default headers.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="Endpoint" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Relative URL path for the HTTP request (supports '{{ input.FieldName }}' template interpolation).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="EndpointFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the relative endpoint URL.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="HttpMethod" type="xs:string" use="optional" default="POST">
+          <xs:annotation>
+            <xs:documentation>HTTP method verb (e.g., 'POST', 'PUT', 'PATCH'). Default is 'POST'.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="PayloadFormat" type="HttpPayloadFormatType" use="optional" default="Json">
+          <xs:annotation>
+            <xs:documentation>Format of the HTTP request payload ('Json', 'Xml', or 'Csv'). Default is 'Json'.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="JsonOutputStepType">
+    <xs:annotation>
+      <xs:documentation>Writes output records to a JSON file on disk.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="OutputProviderCommonType">
-        <xs:attribute name="FilePath" type="xs:string" use="optional" />
-        <xs:attribute name="FilePathFromField" type="xs:string" use="optional" />
+        <xs:attribute name="FilePath" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Destination path for the JSON output file (supports '{{ input.FieldName }}' template interpolation).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="FilePathFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the destination JSON file path.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="XmlOutputStepType">
+    <xs:annotation>
+      <xs:documentation>Writes output records to an XML file on disk with configurable root and record element names.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="OutputProviderCommonType">
-        <xs:attribute name="FilePath" type="xs:string" use="optional" />
-        <xs:attribute name="FilePathFromField" type="xs:string" use="optional" />
-        <xs:attribute name="XmlRootElement" type="xs:string" use="optional" />
-        <xs:attribute name="XmlRootElementFromField" type="xs:string" use="optional" />
-        <xs:attribute name="XmlRecordElement" type="xs:string" use="optional" />
-        <xs:attribute name="XmlRecordElementFromField" type="xs:string" use="optional" />
+        <xs:attribute name="FilePath" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Destination path for the XML output file (supports '{{ input.FieldName }}' template interpolation).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="FilePathFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the destination XML file path.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="XmlRootElement" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the root XML element (e.g., 'Orders').</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="XmlRootElementFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the root XML element name.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="XmlRecordElement" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of each individual record item XML element (e.g., 'Order').</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="XmlRecordElementFromField" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Name of the record field containing the individual record element name.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="MemoryOutputStepType">
+    <xs:annotation>
+      <xs:documentation>Captures output records in-memory for testing, debugging, or programmatic inspection.</xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
-      <xs:extension base="OutputProviderCommonType">
-      </xs:extension>
+      <xs:extension base="OutputProviderCommonType" />
     </xs:complexContent>
   </xs:complexType>
 
